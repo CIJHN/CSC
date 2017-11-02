@@ -1,0 +1,61 @@
+Announcement:
+
+"I have read and understood the Academic Misconduct Policy for
+Undergraduates, the related sections 102.01-102.016 and 105.15 of the
+UC Santa Cruz Student Policies and Regulations Handbook,
+and the related sections of the class syllabus."
+Hongze Xu
+
+"I wrote this assignment using only permitted sources that do not require citation, according to the syllabus."
+
+Description:
+
+This program is about reading graph's edge from file and display to screen.
+Then it apply the dps and scc algorithm.
+
+TestFile and tests:
+
+This program use Makefile phony targets to run the test.
+
+test1.in is the simple form provided from class locker.
+It will test the basic file (graph/edge) reading, and the printing for basic case.
+Since not all vertices have a edge, this file could test the case that the vertex has no edge(null case).
+
+test.in is a standard graph with cycle.
+It can test for the common situations.
+
+target testBase:
+	This is the most basic target using test1.in to test the basic behavior of the program.
+	The output should be like the sample provided in ho10.txt description.
+
+target testLVBase:
+	This target uses test1.in, the simple file to test.
+	It should test out if handling the graph by IntList or IntVec has differences.
+	Two output should be the same.
+
+target testLUBase:
+	This target tests the case that the IntList handling a simple undirected graph.(test1.in)
+
+target testUBase:
+	This could test if the program could handle the undirected graph for test1.in(simple case)
+	The output should be like:
+	vertex  start   finish
+	1       1       8
+	2       9       10
+	3       2       3
+	4       4       7
+	5       5       6
+	6       11      12
+
+target test:
+	This tests the performance for the common directed graph, test.in
+
+target testU:
+	This could test if the program could handle the common undirected graph for test.in
+
+target testLU:
+	This tests the case that IntList handling the undirected graph.
+
+target testLVU:
+	This target test for the graph in standard condition, if the output between IntList and IntVec are the same, using
+	test.in

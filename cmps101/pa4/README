@@ -1,0 +1,18 @@
+Announcement:
+
+"I have read and understood the Academic Misconduct Policy for
+Undergraduates, the related sections 102.01-102.016 and 105.15 of the
+UC Santa Cruz Student Policies and Regulations Handbook,
+and the related sections of the class syllabus."
+Hongze Xu
+
+"I wrote this assignment using only permitted sources that do not require citation, according to the syllabus."
+
+Description:
+
+This program is about reading graph's edge from file and apply the Prim's Minimum Spanning Tree or Dijkstra's Shortest Path algorithm on the graph.
+Then it displays the process and result on screen.
+
+TestFile and tests:
+
+This program use Makefile phony targets to run the test.
