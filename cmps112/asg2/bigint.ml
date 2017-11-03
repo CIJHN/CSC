@@ -60,12 +60,36 @@ module Bigint = struct
                     | _ -> car :: rem
         in clear_ ls
             
-    let rec cmp' list1 list2 last1 last2 = match (list1, list2, last1, last2) with
-        | [], [], last1, last2      -> last1 >= last2
-        | list1, [], last1, last2   -> true
-        | [], list2, last1, last2   -> false
-        | car1::cdr1, car2::cdr2, last1, last2 ->
-            cmp' cdr1 cdr2 car1 car2
+        let rec compare' list1 list2 = match (list1, list2) with
+        | [], []                 ->  0
+        | list1, []              ->  1
+        | [], list2              -> -1
+        | car1::cdr1, car2::cdr2 -> 
+            let retval = compare' cdr1 cdr2
+            in if retval = 0 && car1 != car2
+               then (if car1 > car2
+                    then 1
+                    else (if car1 < car2
+                    then -1
+                    else 0))
+              else retval
+
+    let cmp (Bigint (neg1, value1)) (Bigint (neg2, value2)) =
+        if neg1 = neg2
+        then compare' value1 value2
+        else if neg1 = Neg
+            then -1
+            else 1
+
+
+    let rec cmp' list1 list2 = 
+        let rec cmp'' list1 list2 last1 last2 = match (list1, list2, last1, last2) with
+            | [], [], last1, last2      -> last1 >= last2
+            | list1, [], last1, last2   -> true
+            | [], list2, last1, last2   -> false
+            | car1::cdr1, car2::cdr2, last1, last2 ->
+                cmp' cdr1 cdr2 car1 car2
+        in cmp'' list1 list2 0 0
             
     let add' (list1: int list) (list2: int list) : int list =
         let rec add'' list1 list2 carry =  
@@ -92,8 +116,8 @@ module Bigint = struct
 
     let add (Bigint (neg1, value1)) (Bigint (neg2, value2)) =
         match (neg1, neg2) with
-            | Pos, Neg  -> if cmp' value1 value2 0 0 then Bigint (Pos, sub' value1 value2) else Bigint (Neg, sub' value2 value1)
-            | Neg, Pos  -> if cmp' value1 value2 0 0 then Bigint (Neg, sub' value1 value2) else Bigint (Pos, sub' value2 value1)
+            | Pos, Neg  -> if cmp' value1 value2 then Bigint (Pos, sub' value1 value2) else Bigint (Neg, sub' value2 value1)
+            | Neg, Pos  -> if cmp' value1 value2 then Bigint (Neg, sub' value1 value2) else Bigint (Pos, sub' value2 value1)
             | _         -> Bigint (neg1, add' value1 value2)
 
     
@@ -101,8 +125,8 @@ module Bigint = struct
         match (neg1, neg2) with 
         | Pos, Neg  -> Bigint (Pos, add' value1 value2) 
         | Neg, Pos  -> Bigint (Neg, add' value1 value2)
-        | Pos, Pos  -> if cmp' value1 value2 0 0 then Bigint (Pos, sub' value1 value2) else Bigint (Neg, sub' value2 value1)
-        | Neg, Neg  -> if cmp' value1 value2 0 0 then Bigint (Neg, sub' value1 value2) else Bigint (Pos, sub' value2 value1)
+        | Pos, Pos  -> if cmp' value1 value2 then Bigint (Pos, sub' value1 value2) else Bigint (Neg, sub' value2 value1)
+        | Neg, Neg  -> if cmp' value1 value2 then Bigint (Neg, sub' value1 value2) else Bigint (Pos, sub' value2 value1)
     
     let rec mulval' ls value carry = match (ls, value, carry) with
         | ls, 0, 0              -> [0]
@@ -115,21 +139,23 @@ module Bigint = struct
     
     let rec right_shift ls times = if times = 0 then ls else right_shift (0 :: ls) (times - 1)
 
-    let rec mul' (list1: int list) (list2: int list) (carry: int list) (digit: int) : int list = match (list1, list2, carry) with
-        | list1, [], []         -> list1
-        | [], list2, []         -> list2
-        | list1, [], carry   -> carry
-        | [], list2, carry   -> carry
-        | list1, car::cdr, [] ->
-            (* printf "%s x %d + 0\n" (string_of_bigint (Bigint (Pos, list1))) car ; *)
-            mul' list1 cdr (mulval' list1 car 0) (digit + 1)
-        | list1, car::cdr, carry ->
-            (* printf "%s x %d + %s\n" (string_of_bigint (Bigint (Pos, list1))) car (string_of_bigint (Bigint (Pos, carry))) ; *)
-            let product = mulval' list1 car 0
-            in mul' list1 cdr (add' (right_shift product digit) carry) (digit + 1)
+    let rec mul' (list1: int list) (list2: int list): int list =
+        let rec mul'' (list1: int list) (list2: int list) (carry: int list) (digit: int) : int list = match (list1, list2, carry) with
+            | list1, [], []         -> list1
+            | [], list2, []         -> list2
+            | list1, [], carry   -> carry
+            | [], list2, carry   -> carry
+            | list1, car::cdr, [] ->
+                (* printf "%s x %d + 0\n" (string_of_bigint (Bigint (Pos, list1))) car ; *)
+                mul' list1 cdr (mulval' list1 car 0) (digit + 1)
+            | list1, car::cdr, carry ->
+                (* printf "%s x %d + %s\n" (string_of_bigint (Bigint (Pos, list1))) car (string_of_bigint (Bigint (Pos, carry))) ; *)
+                let product = mulval' list1 car 0
+                in mul' list1 cdr (add' (right_shift product digit) carry) (digit + 1)
+        in mul'' list1 list2 [] 0
             
     let mul (Bigint (neg1, value1)) (Bigint (neg2, value2)) =
-        Bigint ((if neg1 = neg2 then Pos else Neg), mul' value1 value2 [] 0)
+        Bigint ((if neg1 = neg2 then Pos else Neg), mul' value1 value2)
 
     (* divide the dividend with dividor, return the quot and remainder *)
     let divrem (dividend: int list) (dividor: int list): int list, int list= 
@@ -138,7 +164,7 @@ module Bigint = struct
             else 
                 let quot', accum' = egydivrem dividend (add' quot quot) (add' accum accum)
                 in let sum = add' accum accum' 
-                in if cpm' sum dividend then quot', accum'
+                in if cmp' sum dividend then quot', accum'
                 else (add' quot' quot) sum
         in let quot, approx = egydivrem dividend 1 dividor
         in quot, sub' dividend approx
@@ -154,20 +180,27 @@ module Bigint = struct
             let quot, rem = divrem value1 value2 in rem)
         else Bigint ((if neg1 = neg2 then Pos else Neg), 
             let quot, rem = divrem value2 value1 in rem)
-
-    (* let pow' list1 list2 accum = match (list1, list2, accum) with 
-        | [0], list2, accum   -> 0
-        | list1, [0], accum   -> accum
-        | list1, list2, accum -> 
-            pow' list1 (sub' list2 1 0) (mul' list1 accum [] 0) *)
-
-    (* let pow (Bigint (neg1, value1)) (Bigint (neg2, value2)) =
-        match (neg1, neg2) with
-        | Pos, Neg ->
-        | Pos, Pos ->
-        |  *)
-
-    let pow = add
-
+        
+    let even ls =
+        match (ls) with
+        | car::cdr -> 
+            match (car) with 
+            | (0|2|4|6|8) -> true
+            | _ -> false
+        | _ -> true
+    
+    let rec pow' (list1: int list) (list2: int list) (accum : int ) = match (list2) with 
+        | list2 when (cmp' (list2 [1] ) -> accum
+        | list2 when even list2 -> pow'(mul' list1 list1),(divrem list2 [2]),accum
+        
+        | list2 -> 
+            pow' list1 (sub' list2 [1]) (mul' list1 accum)
+    (* for x^n  n >0*)
+     let pow (list1: int list) (list2: int list) (accum : int ) = match ( list1, list2, accum)with  
+     | list1, [0], accum   -> 1
+     | [0], list2, accum   -> 0
+     | list1，list2, accum -> if (compare' list2 [0])= -1  then pow'([1],list1), (list2), [1]
+        else pow' (list1, list2, [1])
+    (*for n<=0  *)
 end
 
