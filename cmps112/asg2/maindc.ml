@@ -10,6 +10,7 @@ open Scanner
 type stack_t = Bigint.bigint Stack.t
 let push = Stack.push
 let pop = Stack.pop
+let registers = Hashtbl.create 20
 
 let ord thechar = int_of_char thechar
 type binop_t = bigint -> bigint -> bigint
@@ -18,10 +19,13 @@ let print_number number = printf "%s\n%!" (string_of_bigint number)
 
 let print_stackempty () = printf "dc: stack empty\n%!"
 
+
 let executereg (thestack: stack_t) (oper: char) (reg: int) =
     try match oper with
-        | 'l' -> printf "operator l reg 0%o is unimplemented\n%!" reg
-        | 's' -> printf "operator s reg 0%o is unimplemented\n%!" reg
+        | 'l' -> if Hashtbl.mem registers reg 
+            then push (Hashtbl.find registers reg) thestack 
+            else printf "dc: register '%c' (%d) is empty" (char_of_int reg) reg
+        | 's' -> Hashtbl.replace registers reg (pop thestack)
         | _   -> printf "0%o 0%o is unimplemented\n%!" (ord oper) reg
     with Stack.Empty -> print_stackempty()
 
