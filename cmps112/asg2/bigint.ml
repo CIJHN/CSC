@@ -122,7 +122,8 @@ module Bigint = struct
         then Bigint (Neg, sub' value1 value2) 
         else Bigint (Pos, sub' value2 value1)
     
-    let rec mulval' ls value carry = match (ls, value, carry) with
+    let rec mulval' ls value carry =
+         match (ls, value, carry) with
         | ls, 0, 0              -> [0]
         | [], value, 0          -> []
         | ls, 0, carry          -> [carry]
