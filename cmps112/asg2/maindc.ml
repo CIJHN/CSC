@@ -24,7 +24,8 @@ let executereg (thestack: stack_t) (oper: char) (reg: int) =
     try match oper with
         | 'l' -> if Hashtbl.mem registers reg 
             then push (Hashtbl.find registers reg) thestack 
-            else printf "dc: register '%c' (%d) is empty" (char_of_int reg) reg
+            else printf "dc: register '%c' (%d) is empty" 
+                (char_of_int reg) reg
         | 's' -> Hashtbl.replace registers reg (pop thestack)
         | _   -> printf "0%o 0%o is unimplemented\n%!" (ord oper) reg
     with Stack.Empty -> print_stackempty()
