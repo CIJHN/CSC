@@ -41,7 +41,8 @@ module Bigint = struct
     let rec wrap_line str: string = 
         let len = strlen str
         in if len > 70 
-        then strcat "" [(strsub str 0 69) ; "\\" ; "\n" ; (wrap_line (strsub str 69 (len - 69)))]
+        then strcat "" [(strsub str 0 69) ; "\\" ; "\n" ; 
+        (wrap_line (strsub str 69 (len - 69)))]
         else str
 
     let string_of_bigint (Bigint (sign, value)) =
@@ -203,7 +204,8 @@ module Bigint = struct
             | [] -> accum
             | [0] -> accum
             | _ -> if even list2 
-                then pow'' (mul' list1 list1) (let q, r = divrem list2 [2] in q) accum
+                then pow'' (mul' list1 list1) 
+                    (let q, r = divrem list2 [2] in q) accum
                 else pow'' list1 (sub' list2 [1]) (mul' accum list1)
         in pow'' list1 list2 [1]
 
