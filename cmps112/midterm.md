@@ -50,9 +50,27 @@ It was published on Com- munications of the ACM, Vol. 11, No. 3, March 1968 by *
 
 ## Common functional operations
 
-### map
+### reduce (fold_left)
 
-### reduce (foldl)
+Scheme:
+```(scheme)
+(define (reduce func init ls) 
+    (if (null? ls) init
+        (reduce func (func init (car ls)) (cdr ls))
+    )
+)
+```
+
+OCaml:
+```(ocaml)
+let rec reduce func init ls = 
+    match (ls) with 
+    | [] -> init
+    | car::cdr -> 
+        reduce func (func init car) cdr
+```
+
+### map
 
 ### filter
 
