@@ -137,6 +137,26 @@ let rec reduce func init ls =
         reduce func (func init car) cdr
 ```
 
+### reduceRight (fold_right)
+
+Scheme:
+```(scheme)
+(define (fold_right func ls init)
+    (if (null? ls) init
+        (func init (fold_right func (cdr ls) (car ls)) )
+    ) 
+)
+```
+
+OCaml:
+```(ocaml)
+let rec reduceRight func ls init = 
+    match (ls) with 
+    | [] -> init
+    | car::cdr -> 
+         func init (reduceRight func cdr car)
+```
+
 ### reverse
 
 Scheme:
@@ -188,6 +208,19 @@ Scheme:
         `() 
         list)
     )
+)
+```
+
+```(scheme)
+(define (map func list)
+    (define (mapp func list accum)
+        (if (null? list) 
+            accum
+            (define last (mapp func (cdr list) (cons (func (car list)) accum) ) )
+            (mapp func (cdr list) (cons (func (car list)) accum) )
+        )
+    )
+    (reverse (mapp func list `()))
 )
 ```
 
