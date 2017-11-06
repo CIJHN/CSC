@@ -50,7 +50,7 @@ It was published on Com- munications of the ACM, Vol. 11, No. 3, March 1968 by *
 
 ### Polymorphism
 
-Universal polymorphism are parametric polymorphism and inclusion(subtyping) polymorphism.
+Universal polymorphism are **parametric polymorphism** and **inclusion(subtyping) polymorphism**.
 
 Parametric polymorphism is basically the java generic and c++ template. 
 
@@ -90,7 +90,7 @@ Inclusion(java):
     allWorkersInCompany.add(new Programmer());
     allWorkersInCompany.add(new Programmer());
     for (Worker w : allWorkersInCompany) {
-        w.work(); // all workers, what ever programmer or manager, are called work with same interface
+        w.work(); // all workers, whatever programmer or manager, are called work with same interface
     }
 
 Two other polymorphsm:
@@ -137,7 +137,77 @@ let rec reduce func init ls =
         reduce func (func init car) cdr
 ```
 
+### reverse
+
+Scheme:
+
+```(scheme)
+(define (reverse ls)
+    (define (reversee ls accum)
+        (if (null? ls)
+            accum
+            (reversee (cdr ls) (cons (car ls) accum) )
+        )
+    )
+    (reversee ls `())
+)
+```
+
+OCaml:
+
+```(ocaml)
+let reverse ls = 
+    let rec reversee ls accum = 
+    match (ls) with 
+    | [] -> accum
+    | car::cdr ->
+        reversee cdr (car :: accum)
+    in reversee ls []
+```
+
 ### map
+
+Scheme:
+
+```(scheme)
+(define (map func list)
+    (define (mapp func list accum)
+        (if (null? list) 
+            accum
+            (mapp func (cdr list) (cons (func (car list)) accum) )
+        )
+    )
+    (reverse (mapp func list `()))
+)
+```
+
+```(scheme)
+(define (map func list)
+    (reverse (fold_left 
+        (lambda (ls val) (cons (func val) ls)) 
+        `() 
+        list)
+    )
+)
+```
+
+OCaml:
+
+```(ocaml)
+let map func ls = 
+    let rec mapp func ls accum = 
+        match (ls) with
+        | [] -> accum
+        | car::cdr ->
+            mapp func cdr ((func car) :: accum)
+    in List.rev (mapp func ls [])
+```
+
+```(ocaml)
+let map func ls = 
+    List.rev (List.fold_left 
+        (fun prev v -> ((func v) :: prev)) [] ls)
+```
 
 ### filter
 
