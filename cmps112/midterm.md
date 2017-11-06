@@ -48,7 +48,74 @@ It was published on Com- munications of the ACM, Vol. 11, No. 3, March 1968 by *
 
 ~~I think this idea is really well-known...~~
 
-## Common functional operations
+### Polymorphism
+
+Universal polymorphism are parametric polymorphism and inclusion(subtyping) polymorphism.
+
+Parametric polymorphism is basically the java generic and c++ template. 
+
+The inclusion polymorphism is the hierarchy structure in java and c++ 
+
+These polymorphsm brings us:
+
+- Parametric: the ablity to define the class for certain types that adapts with same operations/functions/methods set.
+- Inclusion: the ability to define the different classes and use them with a same interfaces.
+
+Parametric(java):
+
+    List<String> list = new ArrayList<>();
+    list.add("a");
+    List<Integer> intList = new ArrayList<>();
+    intList.add(1);
+    // here the same method shared with the different generic-type
+
+Inclusion(java):
+
+    class Worker {
+        public void work() { /*do some work*/ }
+    }
+
+    class Programmer extends Worker {
+        @Override
+        public void work() { /* do coding stuff */ }
+    }
+
+    class Manager extends Worker {
+        @Override
+        public void work() { /* do managing stuff */ }
+    }
+
+    List<Worker> allWorkersInCompany = new ArrayList<>();
+    allWorkersInCompany.add(new Manager());
+    allWorkersInCompany.add(new Programmer());
+    allWorkersInCompany.add(new Programmer());
+    for (Worker w : allWorkersInCompany) {
+        w.work(); // all workers, what ever programmer or manager, are called work with same interface
+    }
+
+Two other polymorphsm:
+
+- Coercion: implicit type conversion between several types
+- Overloading: a single identifier denotes several functions/methods
+
+Coercion (java): 
+
+    1 + "1" // int + string -> string
+    1 + 0.1f // int + float -> float
+
+Overloading(c++):
+
+    class Matrix2X2 {
+        // overload the + operator
+    }
+
+    auto a = Matrix2X2(2, 2, 3, 3);
+    auto b = Matrix2X2(1, 1, 3, 3);
+    auto c = a + b; // c == Matrix2X2(3, 3, 6, 6);
+    auto d = 1 + 1; // d == 2
+    // here + operator perform two function with different type
+
+## Common functional operations and implementations
 
 ### reduce (fold_left)
 
@@ -77,5 +144,14 @@ let rec reduce func init ls =
 
 ## Useful Links
 
-[TypingQuadrant](http://wiki.c2.com/?TypingQuadrant), [History of Programming Languages](https://quizlet.com/161736404/ics-history-of-programming-languages-flash-cards/),
-[Beta Reduction](https://wiki.haskell.org/Beta_reduction), [OCaml and Java](http://wanwenli.com/programming/2013/12/27/Type-Systems.html)
+[TypingQuadrant](http://wiki.c2.com/?TypingQuadrant), 
+
+[History of Programming Languages](https://quizlet.com/161736404/ics-history-of-programming-languages-flash-cards/),
+
+[Beta Reduction](https://wiki.haskell.org/Beta_reduction), [OCaml and Java](http://wanwenli.com/programming/2013/12/27/Type-Systems.html), 
+
+[Polymorphism](https://www.javaworld.com/article/2075223/core-java/reveal-the-magic-behind-subtype-polymorphism.html),
+
+[Universal Polymorphism](https://en.wikibooks.org/wiki/Introduction_to_Programming_Languages/Universal_Polymorphism)
+
+[OCaml Subtyping and Inclusion Polymorphism](https://caml.inria.fr/pub/docs/oreilly-book/html/book-ora144.html)
