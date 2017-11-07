@@ -249,6 +249,29 @@ let rec map func ls =
 
 ### filter
 
+Scheme:
+
+```(scheme)
+(define (filter pred ls)
+    (if (null? ls) 
+        `()
+        (if (pred (car ls)) 
+            (cons (car ls) (filter pred (cdr ls)) )
+            (filter pred (cdr ls) )
+        )
+    )
+)
+```
+
+OCaml:
+
+```(ocaml)
+let rec filter pred ls = 
+    match (ls) with
+    | [] -> []
+    | car::cdr ->
+        if (pred car) then (car :: (filter pred cdr)) else (filter pred cdr)
+```
 
 ## Useful Links
 
