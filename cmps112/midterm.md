@@ -10,6 +10,7 @@ This document contains the possible knowledge for cmps112 midterm.
 | ---------- | ---------------------------- | ------------------------------------------------------------ |
 | Lisp       | McCarthy                     | dynamic-strong typed, functional                             |
 | Scheme     | Steele and Sussman           | dynamic-strong typed, functional                             |
+| Fortran    | John Backus and IBM          | static-weak typed, functional                                |
 | λ-calculus | Alonzo Church                | mathematics form                                             |
 | BASIC      | John Kemeny and Thomas Kurtz |                                                              |
 | COBOL      |                              | designed for business data processing                        |
@@ -17,7 +18,7 @@ This document contains the possible knowledge for cmps112 midterm.
 | Java       |                              | static-strong typed, OO                                      |
 | C          |                              | static-weak typed                                            |
 | C++        |                              | static-strong typed, OO, (someone think cpp is weak type...) |
-| make       |                              | a ‘‘little’’ language. (not turning complete!)           |
+| make       |                              | a ‘‘little’’ language. (not turning complete!)               |
 
 
 Lisp and Scheme are standard `functional programming language` (of course). They are based on `λ-calculus`
@@ -213,14 +214,10 @@ Scheme:
 
 ```(scheme)
 (define (map func list)
-    (define (mapp func list accum)
-        (if (null? list) 
-            accum
-            (define last (mapp func (cdr list) (cons (func (car list)) accum) ) )
-            (mapp func (cdr list) (cons (func (car list)) accum) )
-        )
+    (if (null? list) 
+        `()
+        (cons (func (car list)) (map func (cdr list)) )
     )
-    (reverse (mapp func list `()))
 )
 ```
 
@@ -242,6 +239,14 @@ let map func ls =
         (fun prev v -> ((func v) :: prev)) [] ls)
 ```
 
+```(ocaml)
+let rec map func ls = 
+    match (ls) with
+    | [] -> []
+    | car::cdr ->
+        (func car) :: (map func cdr)
+```
+
 ### filter
 
 
@@ -251,7 +256,9 @@ let map func ls =
 
 [History of Programming Languages](https://quizlet.com/161736404/ics-history-of-programming-languages-flash-cards/),
 
-[Beta Reduction](https://wiki.haskell.org/Beta_reduction), [OCaml and Java](http://wanwenli.com/programming/2013/12/27/Type-Systems.html), 
+[Beta Reduction](https://wiki.haskell.org/Beta_reduction),
+
+[OCaml and Java](http://wanwenli.com/programming/2013/12/27/Type-Systems.html), 
 
 [Polymorphism](https://www.javaworld.com/article/2075223/core-java/reveal-the-magic-behind-subtype-polymorphism.html),
 
