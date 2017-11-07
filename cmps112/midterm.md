@@ -253,6 +253,16 @@ Scheme:
 
 ```(scheme)
 (define (filter pred ls)
+    (reverse (foldl 
+        (lambda (val accum) (if (pred val) (cons val accum) accum) ) 
+        `()
+        ls
+    ))
+)
+```
+
+```(scheme)
+(define (filter pred ls)
     (if (null? ls) 
         `()
         (if (pred (car ls)) 
@@ -264,6 +274,11 @@ Scheme:
 ```
 
 OCaml:
+
+```(ocaml)
+let filter pred ls = 
+    List.rev (List.fold_left (fun accum v -> if (pred v) then (v :: accum) else accum) [] ls) 
+```
 
 ```(ocaml)
 let rec filter pred ls = 
