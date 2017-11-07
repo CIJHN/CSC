@@ -204,8 +204,8 @@ Scheme:
 
 ```(scheme)
 (define (map func list)
-    (reverse (fold_left 
-        (lambda (ls val) (cons (func val) ls)) 
+    (reverse (foldl 
+        (lambda (val ls) (cons (func val) ls)) 
         `() 
         list)
     )
