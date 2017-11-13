@@ -8,12 +8,12 @@ This document contains the possible knowledge for cmps112 midterm.
 
 | Language   | Author                       | Features                                                     |
 | ---------- | ---------------------------- | ------------------------------------------------------------ |
-| Lisp       | McCarthy                     | dynamic-strong typed, functional                             |
+| Lisp       | John McCarthy                | dynamic-strong typed, functional                             |
 | Scheme     | Steele and Sussman           | dynamic-strong typed, functional                             |
 | Fortran    | John Backus and IBM          | static-weak typed, functional                                |
 | λ-calculus | Alonzo Church                | mathematics form                                             |
 | BASIC      | John Kemeny and Thomas Kurtz |                                                              |
-| COBOL      |                              | designed for business data processing                        |
+| COBOL      | Grace Hopper                 | designed for business data processing                        |
 | OCaml      |                              | static-strong typed, functional, OO, static type inference   |
 | Java       |                              | static-strong typed, OO                                      |
 | C          |                              | static-weak typed                                            |
@@ -29,9 +29,9 @@ Lisp and Scheme are standard `functional programming language` (of course). They
 
 2. When an expression is evaluated, exactly one of the following general things might happen :
 
-    - it may evaluate to a value of the same type as the expression,
-    - it may raise an exception,
-    - it may not terminate,
+    - it may evaluate to a value of the same type as the expression
+    - it may raise an exception
+    - it may not terminate
     - it may exit.
 
 ### Beta Reduction
