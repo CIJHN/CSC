@@ -102,3 +102,45 @@ Busniess req                            acceptance testing
 ```
 
 ## Unit test
+
+## Desirable Test Characteristics (F.I.R.S.T.)
+
+Fast
+- tests will run frequently
+- Small and simple: test one concept at a time
+
+Independent
+- No dependencies between tests
+- Tests can run in any order
+- Simplifies failure analysis (debugging)
+
+Repeatable
+- Tests can run at any time, in any order
+
+Self-Validating
+- Test either pass or fail (Boolean result)
+
+Timely
+- Write the tests when you need them
+- In TDD: write test first, then code
+
+## Common Unit Test Pattern/Practice
+
+Test Stub
+
+- Supplies indirect inputs to SUT
+
+Test Spy
+
+- Observes and records calls to Depended-on Components (DoC)
+- Provides retrieval interface for test verification (assertion methods)
+- May also provide indirect inputs
+
+Mock Object
+- Compares actual invocation of DoC with expected invocation during SUT execution 
+
+- May also provide indirect inputs
+
+Fake objects
+- “knock-offs” of DoCwith same functionality but more efficient
+- E.g. hash table instead of relational D
