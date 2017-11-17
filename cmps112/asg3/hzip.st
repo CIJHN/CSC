@@ -72,8 +72,11 @@ Leaf subclass: Tree [
 Object subclass: Person [
     |name age gender|
 
+    Leaf class >> new [
+        self shouldNotImplement
+    ]
+
     setName: aname [
-        stdout << self getName << Character nl.
         name := aname.
     ]
 
