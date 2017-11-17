@@ -77,7 +77,7 @@ Object subclass: Person [
     ]
 
     getName [
-        name
+        ^name
     ]
 ]
 
