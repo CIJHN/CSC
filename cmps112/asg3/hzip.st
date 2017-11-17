@@ -75,7 +75,7 @@ Object subclass: Person [
     Person class >> testStatic [
         stdout << 'static test!' << Character nl.
     ]
-    Person class >> new aname age: aage [
+    Person class >> new: aname age: aage [
         name := aname
         age := aage
     ]
