@@ -82,7 +82,7 @@ Object subclass: Person [
 ]
 
 person := Person new.
-stdout << person name << Character nl.
+stdout << person getName << Character nl.
 person setName: 'Wenqiao'.
-stdout << person name << Character nl.
+stdout << person getName << Character nl.
 
