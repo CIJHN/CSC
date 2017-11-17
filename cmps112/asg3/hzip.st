@@ -71,8 +71,8 @@ Leaf subclass: Tree [
 
 Object subclass: Person [
     |name age gender|
-
-    Person class >> new name: aname age: aage[
+    
+    Person class >> new name: aname age: aage [
         name := aname
         age := aage
     ]
