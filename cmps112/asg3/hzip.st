@@ -72,21 +72,22 @@ Leaf subclass: Tree [
 Object subclass: Person [
     |name age gender|
 
-    Person class >> new [
-        self shouldNotImplement
+    Person class >> new name: aname age: aage[
+        name := aname
+        age := aage
     ]
 
     setName: aname [
         name := aname.
     ]
 
-    getName [
+    name [
         ^name.
     ]
 ]
 
-person := Person new.
-stdout << person getName << Character nl.
-person setName: 'Wenqiao'.
-stdout << person getName << Character nl.
+person := Person new name: 'Wenqiao' age: 21.
+stdout << person name << Character nl.
+person setName: 'jiong'.
+stdout << person name << Character nl.
 
