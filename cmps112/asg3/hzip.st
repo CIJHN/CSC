@@ -27,7 +27,7 @@ Object subclass: Leaf [
    ]
 
    printBase: aStream [
-      ^ aStream << self class << '(' << char << ',' << count
+      ^ aStream << self class << '(' << char << ',' << count.
    ]
 
    printOn: aStream [
@@ -75,9 +75,17 @@ Object subclass: Person [
     Person class >> testStatic [
         stdout << 'static test!' << Character nl.
     ]
+
     Person class >> new: aname age: aage [
-        name := aname.
-        age := aage.
+        | built |
+        built := super new.
+        built init: aname age: aage.
+        ^ built.
+    ]
+
+    init: aname age: aage [
+        age = aage.
+        name = aname.
     ]
 
     setName: aname [
