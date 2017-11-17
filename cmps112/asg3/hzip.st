@@ -97,7 +97,7 @@ Object subclass: Person [
     ]
 ]
 
-person := Person new 'Wenqiao' age: 21.
+person := Person new: 'Wenqiao' age: 21.
 Person testStatic.
 stdout << person name << Character nl.
 person setName: 'jiong'.
