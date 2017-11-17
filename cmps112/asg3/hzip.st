@@ -72,7 +72,7 @@ Leaf subclass: Tree [
 Object subclass: Person [
     |name age gender|
 
-    Leaf class >> new [
+    Person class >> new [
         self shouldNotImplement
     ]
 
