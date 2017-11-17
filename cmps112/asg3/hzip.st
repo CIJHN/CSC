@@ -71,8 +71,11 @@ Leaf subclass: Tree [
 
 Object subclass: Person [
     |name age gender|
-    
-    Person class >> new name: aname age: aage [
+
+    Person class >> testStatic [
+        stdout << 'static test!' << Character nl.
+    ]
+    Person class >> new aname age: aage [
         name := aname
         age := aage
     ]
@@ -86,7 +89,8 @@ Object subclass: Person [
     ]
 ]
 
-person := Person new name: 'Wenqiao' age: 21.
+person := Person new 'Wenqiao' age: 21.
+Person testStatic
 stdout << person name << Character nl.
 person setName: 'jiong'.
 stdout << person name << Character nl.
