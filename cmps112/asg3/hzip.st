@@ -1,4 +1,5 @@
 "Start Code from example"
+
 Object subclass: Leaf [
    |char count|
    char [ ^ char ]
@@ -67,3 +68,21 @@ Leaf subclass: Tree [
       right inorder: visitor prefix: string, '1'.
    ]
 ]
+
+Object subclass: Person [
+    |name age gender|
+
+    setName: aname [
+        name = aname
+    ]
+
+    getName [
+        name
+    ]
+]
+
+person := Person new.
+stdout << person name << Character nl.
+person setName: 'Wenqiao'.
+stdout << person name << Character nl.
+
