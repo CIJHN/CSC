@@ -73,9 +73,8 @@ Object subclass: Person [
     |name age gender|
 
     setName: aname [
-        stdout << aname << Character nl.
+        stdout << self << Character nl.
         name := aname.
-        stdout << name << Character nl.
     ]
 
     getName [
