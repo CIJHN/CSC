@@ -51,7 +51,7 @@ Leaf subclass: Tree [
       |result|
       result := super new: aChar count: aCount.
       result setLeft: aLeft andRight: aRight.
-      ^ result
+      ^ result.
    ]
 
    setLeft: aLeft andRight: aRight [
@@ -76,8 +76,8 @@ Object subclass: Person [
         stdout << 'static test!' << Character nl.
     ]
     Person class >> new: aname age: aage [
-        name := aname
-        age := aage
+        name := aname.
+        age := aage.
     ]
 
     setName: aname [
@@ -90,7 +90,7 @@ Object subclass: Person [
 ]
 
 person := Person new 'Wenqiao' age: 21.
-Person testStatic
+Person testStatic.
 stdout << person name << Character nl.
 person setName: 'jiong'.
 stdout << person name << Character nl.
