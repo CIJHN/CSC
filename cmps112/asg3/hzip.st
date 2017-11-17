@@ -74,8 +74,7 @@ Object subclass: Person [
 
     setName: aname [
         stdout << aname << Character nl.
-        stdout << name << Character nl.
-        name = aname.
+        name := aname.
         stdout << name << Character nl.
     ]
 
