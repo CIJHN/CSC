@@ -97,9 +97,16 @@ Object subclass: Person [
     ]
 ]
 
+|d count value|
+d := Dictionary new.
+count := Integer 1.
+value := Character nl.
+stdout << d count << Integer count.
+
+
 person := Person new: 'Wenqiao' age: 21.
 Person testStatic.
 stdout << person name << Character nl.
 person setName: 'jiong'.
-stdout << person name << Character nl.
+stdout << person name << Character nl.  
 
