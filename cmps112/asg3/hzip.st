@@ -215,11 +215,20 @@ Object subclass: BitStream [
 
 "*-------------------------------*"
 |isD isT isC isU outfile argc|
-
-opD := 0.
-opT := 0.
-opC := 0.
-opU := 0.
+"  -d Debug information is printed for the benefit of the application
+     author. Exact details are not specified.
+  -t The compression algorithm is activated, and the decoding
+     tree is printed to the standard output. The output
+     filename may not be specified.
+  -c The input file is compressed and written to the output
+     file, if specified, or to the standard output, if not.
+  -u The input file is assumed to be compressed, and is
+     uncompressed, written to the output file, if specified, or
+     to the standard output, if not."
+isD := false.
+isT := false.
+isC := false.
+isU := false.
 outfilename :=stdout.
 pqueue := SortedCollection new.
 
@@ -252,7 +261,7 @@ ifFalse: [
   ObjectMemory quit:1
 ].
 
-(isD = 1) ifTrue:[
+isD ifTrue:[
   stdout <<'deubgger :input file is ' << infile <<'||'
         <<' output file is ' << outfile << nl.
 ].
@@ -269,7 +278,7 @@ ifFalse:[
 ].
 
 "----------compression------------"
-(isU =0) ifFalse:[
+isU ifFalse:[
   [inputfile atEnd not] whileTrue:[
     |ordChar|
     ordChar:= inputfile next asInteger.
@@ -299,7 +308,7 @@ etree = nil ifFalse: [
    ] prefix: ''.
 ].
 
-(isT =1) ifTrue:[
+isT ifTrue:[
   |char number bitstring count temp|
    encodingT keysAndValuesDo: [:index :number |
       (number notNil and: [number > 0]) ifTrue: [
@@ -332,12 +341,12 @@ etree = nil ifFalse: [
    ].
 ].
 
-opC ifTrue: [
+isC ifTrue: [
    |readfile|
    readfile := FileStream open: infile
                           mode: FileStream read.
   
-   opD ifTrue: [
+   isD ifTrue: [
       (outputfile = nil) ifTrue: [
          stdout << 'Writefile is nil. Printing to stdout.' << nl.
       ]
@@ -406,12 +415,12 @@ opC ifTrue: [
 
 "-----------------------decompression--------------------------"
 
-(isU=1) ifTrue: [
+isU ifTrue: [
    |stack retree eof|
    "initialize stack"
    "copybits := OutBits new: writefile."
    
-   (isD=1) ifTrue:[
+   isD ifTrue:[
        (outputfile = nil) ifTrue:[
           stdout << 'outputfile is nil. Printing to stdout' << nl.
        ]
@@ -509,7 +518,7 @@ opC ifTrue: [
                   rootnode char = 256 ifTrue: [eof := true]
                   ifFalse:[
                      echar := Character value: rootnode char.
-                     writefile nextPut: echar.
+                     outputfile nextPut: echar.
                      rootnode := reTree.
                   ]
                ]
