@@ -252,6 +252,11 @@ ifFalse: [
   ObjectMemory quit:1
 ].
 
+(isD = 1) ifTrue:[
+  stdout <<'deubgger :input file is ' << infile <<'||'
+        <<' output file is ' << outfile << nl.
+].
+
 |inputfile outputfile|
 inputfile := FileStream open :infile 
                         mode :FileStream read.
@@ -263,3 +268,257 @@ ifFalse:[
                        mode : FileStream write.
 ].
 
+"----------compression------------"
+(isU =0) ifFalse:[
+  [inputfile atEnd not] whileTrue:[
+    |ordChar|
+    ordChar:= inputfile next asInteger.
+    freqtable incr: ordChar.
+  ].
+
+freqtable keysAndValuesDo: [:key :value |
+   (value notNil and: [value > 0]) ifTrue: [
+      pqueue add: (Leaf new: key count: value).
+   ]
+].
+
+[priorityqueue size > 1] whileTrue: [
+   |lchild rchild tCount tChar| 
+   lchild := pqueue removeFirst.
+   rchild := pqueue removeFirst.
+   tChar := lchild char.
+   tCount := (rchild count + lchild count).
+   newTree := Tree new: tChar count: tCount left: lchild right: rchild.
+   pqueue add: newTree.
+].
+
+etree := pqueue removeFirst.
+etree = nil ifFalse: [
+   etree inorder: [:char :string |
+      encodingT at: char put: string.
+   ] prefix: ''.
+].
+
+(isT =1) ifTrue:[
+  |char number bitstring count temp|
+   encodingT keysAndValuesDo: [:index :number |
+      (number notNil and: [number > 0]) ifTrue: [
+      
+      ((index > 32) & (index < 128)) ifTrue: [
+         char := (Character value: index).
+      ]
+      ifFalse: [
+         index = 256 ifTrue: [char := 'EOF']
+         ifFalse: [
+            char:= (Character value: index) asInteger radix: 16.
+            char := char copyFrom: 4 to: char size.
+            index < 16 ifTrue:[
+               char := ('x0', char).
+            ]
+            ifFalse: [
+               index < 33 ifTrue:[ char := ('x', char). ]
+            ]
+         ]
+      ].
+      bitstring := encodtable at: index.
+      count := 0. 
+      stdout << char.
+      char asString size to: 5 do: [:skip| stdout << ' '].
+      stdout << (freqtable at: index).
+      temp := (freqtable at: index). 
+      temp asString size to: 4 do: [:skip| stdout << ' '].
+      stdout << bitstring << nl.
+      ].
+   ].
+].
+
+opC ifTrue: [
+   |readfile|
+   readfile := FileStream open: infile
+                          mode: FileStream read.
+  
+   opD ifTrue: [
+      (outputfile = nil) ifTrue: [
+         stdout << 'Writefile is nil. Printing to stdout.' << nl.
+      ]
+      ifFalse:[
+         stdout << 'Printing to ' << outfile << nl.
+      ].
+      stdout << '-------Compression-------' << nl.
+   ].
+   outputfile = nil
+   "if there is no outfile"
+   ifTrue: [
+      outputfile := stdout.
+   ]
+   ifFalse: [
+      outputfile := FileStream open: outfilename
+                              mode: FileStream write.
+   ].
+   
+   bitrep := ''.
+   etree postorder: [:char :aleaf |
+      aleaf ifTrue:[
+         tempbit := ''.
+         char = 0 "if byte is 0"
+         ifTrue:[tempbit := '000000000']
+         ifFalse:[
+            char = 256 "if byte is EOF"
+            ifTrue:[tempbit := '000000001']
+            ifFalse:["if not 0 or 256, write from bit 7 to 0"
+               8 to: 1 by: -1 do: [:i |
+                  tempbit := tempbit, ((char bitAt: i) printString).
+               ]
+            ].
+         ].
+         bitrep := (bitrep, '0', tempbit).
+      ]
+      ifFalse:[ "if not leaf"
+         bitrep := (bitrep, '1').
+      ].
+   ].
+      "copy it into outfile"
+      copybits := OutBits new: outputfile.
+      1 to: (bitrep size) do: [:x |
+        bitcopy := ((bitrep at: x) asInteger) - 48.
+        copybits writeBit: bitcopy.
+      ].
+      copybits writeBit: 1.
+      "copy encoding value into outfile"
+      "reopen the infile and write out the encoded version of each byte"
+      [readfile atEnd not] whileTrue: [
+         |index bitwise code|
+         index := readfile next asInteger.
+         code := encodtable at: index.
+         code do: [:char |
+            bitwise := char asInteger - 48.
+            copybits writeBit: bitwise.
+         ].
+      ].
+      eoftrue := encodtable at: 256.
+      eoftrue do: [:char |
+         bitwise := char asInteger - 48.
+         copybits writeBit: bitwise.
+      ].
+      copybits flushByte. 
+   ].
+].
+
+"-----------------------decompression--------------------------"
+
+(isU=1) ifTrue: [
+   |stack retree eof|
+   "initialize stack"
+   "copybits := OutBits new: writefile."
+   
+   (isD=1) ifTrue:[
+       (outputfile = nil) ifTrue:[
+          stdout << 'outputfile is nil. Printing to stdout' << nl.
+       ]
+       ifFalse:[
+          stdout << 'Printing to ' << outfilename << nl.
+       ].
+       stdout << '------Decompression------' << nl.
+   ].
+   outputfile = nil
+   ifTrue:[ outputfile := stdout. ].
+   stack := OrderedCollection new.
+   bitsInFile := BitStream new: inputfile.
+   eof := false.
+   bitChar := 0.
+   reTree := ''.
+   rootnode := ''.
+   finished := false.
+   "rebuild the tree."
+   [(bitsInFile atEnd not) & (eof not)] whileTrue:[
+      bitChar := 0.
+      oneBits := bitsInFile nextBit.
+
+      finished ifFalse:[
+        " oneBit := bitsInFile nextBit."
+         "if the bit is 0, read the next 8 bits"
+         oneBits = 0 ifTrue:[
+            8 to: 1 by: -1 do: [:bitindex |
+               oneBit := bitsInFile nextBit.
+              bitChar := bitChar bitAt: bitindex put: oneBit.
+            ].
+            "if value is 0, read one more bit"
+            bitChar = 0 ifTrue:[
+               oneBit := bitsInFile nextBit.
+
+            "if it is 1, add 256 to bitchar"
+               oneBit = 1 ifTrue:[
+                  bitChar := bitChar bitAt: 9 put: 1.
+               ].
+            ].
+      
+         stack add: (Leaf new: bitChar count: 0).
+         ].
+
+         "if the bit is 1"
+         oneBits = 1 ifTrue:[
+            righttr := stack removeLast.
+            
+            "if that was the last tree"
+            stack size = 0 ifTrue:[
+               reTree := righttr.
+               rootnode := reTree.
+               finished := true.
+            ]
+            ifFalse:[
+               lefttr := stack removeLast.
+               newTree := Tree new: 
+               lefttr char count: 0 left: lefttr right: righttr.
+               stack add: newTree.
+            ].
+         ].
+      ]
+      ifTrue: [ "if tree has been reconstructed"
+      "part e"
+         (rootnode aleaf) ifTrue:[
+
+            "if we've found the leaf eof, end loop"
+            rootnode char = 256 ifTrue: [eof := true]
+            ifFalse:[
+               echar := Character value: rootnode char.
+               outputfile nextPut: echar.
+               rootnode := reTree.
+            ].
+         ]
+         "if not a leaf"
+         ifFalse: [
+            oneBits = 0 ifTrue: [
+               rootnode := rootnode left.
+               rootnode aleaf ifTrue:[
+                  eof not ifTrue:[
+                     rootnode char = 256 ifTrue: [eof := true]
+                  
+                     ifFalse: [
+                        echar := Character value: rootnode char.
+                        outputfile nextPut: echar.
+                        rootnode := reTree.
+                     ].
+                  ]
+               ]
+            ]
+
+            "if not 0, check right"
+            ifFalse:[
+               rootnode := rootnode right.
+               rootnode aleaf ifTrue:[
+                  rootnode char = 256 ifTrue: [eof := true]
+                  ifFalse:[
+                     echar := Character value: rootnode char.
+                     writefile nextPut: echar.
+                     rootnode := reTree.
+                  ]
+               ]
+            ].
+         ].
+      ].
+   ].
+].
+inputfile close.
+outputfile ~= nil ifTrue:[
+   outputfile close.
+].
