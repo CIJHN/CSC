@@ -1,5 +1,22 @@
 "Start Code from example"
 
+nl := Character nl.
+FileStream extend [
+   nl := Character nl.
+  " pqueue := SortedCollection new."
+   catFile [
+      |count|
+      count := 0.
+      [self atEnd not] whileTrue: [
+         count := count + 1
+         count asString size to: 5 do: [:skip| stdout << ' '].
+         stdout << count << ': ' << self nextLine << nl.
+      ]
+   ]
+]
+ 
+
+
 Object subclass: Leaf [
    |char count|
    char [ ^ char ]
@@ -99,7 +116,8 @@ Object subclass: Person [
 
 |d count value|
 d := Dictionary new.
-count := Integer 1.
+count := Integer .
+d  : 1.
 value := Character nl.
 stdout << d count << Integer count.
 
