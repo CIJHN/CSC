@@ -213,46 +213,6 @@ Object subclass: BitStream [
    ]
 ]
 
+"*-------------------------------*"
 
-Object subclass: Person [
-    |name age gender|
-
-    Person class >> testStatic [
-        stdout << 'static test!' << Character nl.
-    ]
-
-    Person class >> new: aname age: aage [
-        | built |
-        built := super new.
-        built init: aname age: aage.
-        ^ built.
-    ]
-
-    init: aname age: aage [
-        age = aage.
-        name = aname.
-    ]
-
-    setName: aname [
-        name := aname.
-    ]
-
-    name [
-        ^name.
-    ]
-]
-
-|d count value|
-d := Dictionary new.
-count := Integer .
-d  : 1.
-value := Character nl.
-stdout << d count << Integer count.
-
-
-person := Person new: 'Wenqiao' age: 21.
-Person testStatic.
-stdout << person name << Character nl.
-person setName: 'jiong'.
-stdout << person name << Character nl.  
 
