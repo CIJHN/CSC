@@ -214,5 +214,52 @@ Object subclass: BitStream [
 ]
 
 "*-------------------------------*"
+|isD isT isC isU outfile argc|
 
+opD := 0.
+opT := 0.
+opC := 0.
+opU := 0.
+outfilename :=stdout.
+pqueue := SortedCollection new.
+
+freqtable := ZeroArray new :257.
+encodtable := ZeroArray new :257.
+freqtable at:256 put:1.
+"parse command"
+(1 to :Smalltalk arguments size)do :
+[:index |
+arg:= (Smalltalk aruguments at : index).
+arg:= '-d' ifTrue: [isD := 1].
+arg:= '-c' ifTrue: [isC := 1].
+arg:= '-u' ifTrue: [isU :=1].
+arg := '-t' ifTrue: [isT := 1].
+]
+"if not check for infile"
+ifFalse:[
+  (infile ~= nil) ifFalse:[
+    infile := argu.
+  ]
+]
+
+"if infile has been found, check outfile"
+ifTrue: [
+  outfile := argu.
+]
+
+ifFalse: [
+  stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
+  ObjectMemory quit:1
+].
+
+|inputfile outputfile|
+inputfile := FileStream open :infile 
+                        mode :FileStream read.
+
+outfile =stdout
+ifTrue:[outfile:= nil.]
+ifFalse:[
+  outfile:= FileStream open :outfile
+                       mode : FileStream write.
+].
 
