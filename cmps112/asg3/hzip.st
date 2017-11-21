@@ -1,3 +1,4 @@
+#!/afs/cats.ucsc.edu/courses/cmps112-wm/usr/smalltalk/bin/gst -f
 "Start Code from example"
 
 nl := Character nl.
@@ -231,7 +232,6 @@ isC := false.
 isU := false.
 outfilename :=stdout.
 pqueue := SortedCollection new.
-
 freqtable := ZeroArray new :257.
 encodtable := ZeroArray new :257.
 freqtable at:256 put:1.
