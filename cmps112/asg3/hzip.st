@@ -238,7 +238,7 @@ freqtable at:256 put:1.
 [(Smalltalk arguments size > 1) & (Smalltalk arguments size < 4)]
 ifFalse: [
     stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
-    ObjectMemory quit:1
+    ObjectMemory quit: 1.
 ].
 
 (1 to: Smalltalk arguments size) do: [:index |
