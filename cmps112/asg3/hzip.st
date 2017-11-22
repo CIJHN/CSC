@@ -67,7 +67,6 @@ Object subclass: ZeroArray [
          aBlock value: index value: (self at: index).
       ]
    ]
-
 ]
 
 "Leaf subclass modified from tree.st"
@@ -215,8 +214,8 @@ Object subclass: BitStream [
 ]
 
 "*-------------------------------*"
-|isD isT isC isU outfile argc|
-"  -d Debug information is printed for the benefit of the application
+|debug_mode compress_and_print compressing decompressing filein fileout|
+" -d Debug information is printed for the benefit of the application
      author. Exact details are not specified.
   -t The compression algorithm is activated, and the decoding
      tree is printed to the standard output. The output
@@ -226,75 +225,87 @@ Object subclass: BitStream [
   -u The input file is assumed to be compressed, and is
      uncompressed, written to the output file, if specified, or
      to the standard output, if not."
-isD := false.
-isT := false.
-isC := false.
-isU := false.
-outfilename :=stdout.
+debug_mode := false.
+compress_and_print := false.
+compressing := false.
+decompressing := false.
+
 pqueue := SortedCollection new.
 freqtable := ZeroArray new: 257.
 encodtable := ZeroArray new: 257.
 freqtable at:256 put:1.
 "parse command"
-(1 to: Smalltalk arguments size) do:[:index |
-  argu:= (Smalltalk arguments at: index).
-  (argu include: $-)
-  ifTrue:[
-  argu= '-d' ifTrue: [isD := 1].
-  argu= '-c' ifTrue: [isC := 1].
-  argu= '-u' ifTrue: [isU := 1].
-  argu= '-t' ifTrue: [isT := 1].
-]
-"if not check for infile"
-  ifFalse:[
-  (infile ~= nil) ifFalse:[
-    infile := argu.
-  
-]
-
-"if infile has been found, check outfile"
-ifTrue: [
-  outfile := argu.
-]
-]
-].
-]
+[(Smalltalk arguments size > 1) & (Smalltalk arguments size < 4)]
 ifFalse: [
-  stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
-  ObjectMemory quit:1
+    stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
+    ObjectMemory quit:1
 ].
 
-isD ifTrue:[
-  stdout <<'deubgger :input file is ' << infile <<'||'
+(1 to: Smalltalk arguments size) do: [:index |
+    | argu |
+    argu:= (Smalltalk arguments at: index).
+    (argu include: $-)
+    ifTrue: [
+        [argu = '-d'] ifTrue: [debug_mode := true].
+        [argu = '-c'] ifTrue: [compressing := true].
+        [argu = '-u'] ifTrue: [decompressing := true].
+        [argu = '-t'] ifTrue: [compress_and_print := true].
+    ]
+    ifFalse: [
+        [filein = nil] ifTrue: [
+            filein := argu.
+        ] ifFalse: [
+            [fileout = nil] ifTrue: [
+                fileout := argu.
+            ] ifFalse: [
+                stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
+                ObjectMemory quit: 1.
+            ]
+        ].
+    ].
+].
+
+[filein = nil] ifTrue: [
+    stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
+    ObjectMemory quit: 1.
+]
+
+((compress_and_print not) & fileout = nil) ifFalse: [
+    stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
+    ObjectMemory quit: 1.
+].
+
+debug_mode ifTrue:[
+    stdout <<'deubgger :input file is ' << infile << '||'
         <<' output file is ' << outfile << nl.
 ].
 
-|inputfile outputfile|
-inputfile := FileStream open :infile 
-                        mode :FileStream read.
+|inStream outStream|
+inStream := FileStream open: filein 
+                        mode: FileStream read.
 
-outfile =stdout
-ifTrue:[outfile:= nil.]
-ifFalse:[
-  outfile:= FileStream open :outfile
-                       mode : FileStream write.
-].
+[fileout = nil] ifTrue: [
+    outStream = stdout
+] ifFalse: [
+    outStream = FileStream open: fileout
+                    mode: FileStream write.
+]
 
 "----------compression------------"
-isU ifFalse:[
-  [inputfile atEnd not] whileTrue:[
-    |ordChar|
-    ordChar:= inputfile next asInteger.
-    freqtable incr: ordChar.
-  ].
+decompressing ifFalse:[
+    [inputfile atEnd not] whileTrue: [
+        |ordChar|
+        ordChar := inputfile next asInteger.
+        freqtable incr: ordChar.
+    ].
 
 freqtable keysAndValuesDo: [:key :value |
-   (value notNil and: [value > 0]) ifTrue: [
-      pqueue add: (Leaf new: key count: value).
-   ]
+    (value notNil and: [value > 0]) ifTrue: [
+        pqueue add: (Leaf new: key count: value).
+    ]
 ].
 
-[priorityqueue size > 1] whileTrue: [
+[pqueue size > 1] whileTrue: [
    |lchild rchild tCount tChar| 
    lchild := pqueue removeFirst.
    rchild := pqueue removeFirst.
@@ -311,7 +322,7 @@ etree = nil ifFalse: [
    ] prefix: ''.
 ].
 
-isT ifTrue:[
+compress_and_print ifTrue: [
   |char number bitstring count temp|
    encodingT keysAndValuesDo: [:index :number |
       (number notNil and: [number > 0]) ifTrue: [
@@ -344,12 +355,12 @@ isT ifTrue:[
    ].
 ].
 
-isC ifTrue: [
+compressing ifTrue: [
    |readfile|
    readfile := FileStream open: infile
                           mode: FileStream read.
   
-   isD ifTrue: [
+   debug_mode ifTrue: [
       (outputfile = nil) ifTrue: [
          stdout << 'Writefile is nil. Printing to stdout.' << nl.
       ]
@@ -418,12 +429,12 @@ isC ifTrue: [
 
 "-----------------------decompression--------------------------"
 
-isU ifTrue: [
+decompressing ifTrue: [
    |stack retree eof|
    "initialize stack"
    "copybits := OutBits new: writefile."
    
-   isD ifTrue:[
+   debug_mode ifTrue:[
        (outputfile = nil) ifTrue:[
           stdout << 'outputfile is nil. Printing to stdout' << nl.
        ]
