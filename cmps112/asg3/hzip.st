@@ -259,7 +259,8 @@ ifFalse: [
             filein := argu.
         ] 
         ifFalse: [
-            [fileout = nil] ifTrue: [
+            fileout = nil 
+            ifTrue: [
                 fileout := argu.
             ] ifFalse: [
                 stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
@@ -289,7 +290,7 @@ debug_mode ifTrue:[
 inStream := FileStream open: filein 
                         mode: FileStream read.
 
-fileout = nil 
+fileout = nil
 ifTrue: [
     outStream = stdout
 ] ifFalse: [
@@ -547,7 +548,8 @@ decompressing ifTrue: [
       ].
    ].
 ].
-inputfile close.
-outputfile ~= nil ifTrue:[
-   outputfile close.
+inStream close.
+outStream ~= nil 
+ifTrue: [
+   outStream close.
 ].
