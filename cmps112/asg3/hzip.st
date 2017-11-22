@@ -320,13 +320,13 @@ freqtable keysAndValuesDo: [:key :value |
 etree := pqueue removeFirst.
 etree = nil ifFalse: [
    etree inorder: [:char :string |
-      encodingT at: char put: string.
+      encodtable at: char put: string.
    ] prefix: ''.
 ].
 
 compress_and_print ifTrue: [
   |char number bitstring count temp|
-   encodingT keysAndValuesDo: [:index :number |
+   encodtable keysAndValuesDo: [:index :number |
       (number notNil and: [number > 0]) ifTrue: [
       
       ((index > 32) & (index < 128)) ifTrue: [
