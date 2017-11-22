@@ -263,7 +263,7 @@ ifFalse: [
             ifTrue: [
                 fileout := argu.
             ] ifFalse: [
-                stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
+                stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile], duplicated files' << nl.
                 ObjectMemory quit: 1.
             ].
         ].
@@ -272,12 +272,12 @@ ifFalse: [
 
 filein = nil 
 ifTrue: [
-    stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
+    stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile], filein is nil' << nl.
     ObjectMemory quit: 1.
 ]
 
 ((compress_and_print not) & fileout = nil) ifFalse: [
-    stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
+    stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile], missing fileout' << nl.
     ObjectMemory quit: 1.
 ].
 
