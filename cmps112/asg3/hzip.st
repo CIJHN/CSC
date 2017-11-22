@@ -239,7 +239,7 @@ freqtable at: 256 put: 1.
 "parse command"
 (Smalltalk arguments size > 1) & (Smalltalk arguments size < 4)
 ifFalse: [
-    stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
+    stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile], length: ' << Smalltalk arguments size << nl.
     ObjectMemory quit: 1.
 ].
 
