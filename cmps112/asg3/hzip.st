@@ -232,8 +232,8 @@ isC := false.
 isU := false.
 outfilename :=stdout.
 pqueue := SortedCollection new.
-freqtable := ZeroArray new :257.
-encodtable := ZeroArray new :257.
+freqtable := ZeroArray new: 257.
+encodtable := ZeroArray new: 257.
 freqtable at:256 put:1.
 "parse command"
 (1 to :Smalltalk arguments size)do :
