@@ -229,11 +229,13 @@ debug_mode := false.
 compress_and_print := false.
 compressing := false.
 decompressing := false.
+filein := nil.
+fileout := nil.
 
 pqueue := SortedCollection new.
 freqtable := ZeroArray new: 257.
 encodtable := ZeroArray new: 257.
-freqtable at:256 put:1.
+freqtable at: 256 put: 1.
 "parse command"
 [(Smalltalk arguments size > 1) & (Smalltalk arguments size < 4)]
 ifFalse: [
