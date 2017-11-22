@@ -248,13 +248,13 @@ ifFalse: [
     argu := (Smalltalk arguments at: index).
     (argu ~ '-[dcut]')
     ifTrue: [
-        [argu = '-d'] ifTrue: [debug_mode := true].
-        [argu = '-c'] ifTrue: [compressing := true].
-        [argu = '-u'] ifTrue: [decompressing := true].
-        [argu = '-t'] ifTrue: [compress_and_print := true].
+        argu = '-d' ifTrue: [debug_mode := true].
+        argu = '-c' ifTrue: [compressing := true].
+        argu = '-u' ifTrue: [decompressing := true].
+        argu = '-t' ifTrue: [compress_and_print := true].
     ]
     ifFalse: [
-        filein = nil 
+        filein = nil.
         ifTrue: [
             filein := argu.
         ] 
