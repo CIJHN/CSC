@@ -254,7 +254,7 @@ ifFalse: [
         argu = '-t' ifTrue: [compress_and_print := true].
     ]
     ifFalse: [
-        filein = nil.
+        filein = nil
         ifTrue: [
             filein := argu.
         ] 
