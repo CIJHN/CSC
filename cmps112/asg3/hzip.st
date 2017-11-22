@@ -237,10 +237,10 @@ encodtable := ZeroArray new: 257.
 freqtable at:256 put:1.
 "parse command"
 (1 to: Smalltalk arguments size) do:[:index |
-arg:= (Smalltalk arguments at : index).
+arg:= (Smalltalk arguments at: index).
 arg= '-d' ifTrue: [isD := 1].
 arg= '-c' ifTrue: [isC := 1].
-arg= '-u' ifTrue: [isU :=1].
+arg= '-u' ifTrue: [isU := 1].
 arg= '-t' ifTrue: [isT := 1].
 ]
 "if not check for infile"
