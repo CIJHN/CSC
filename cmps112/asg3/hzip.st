@@ -267,7 +267,8 @@ ifFalse: [
     ].
 ].
 
-[filein = nil] ifTrue: [
+filein = nil 
+ifTrue: [
     stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
     ObjectMemory quit: 1.
 ]
@@ -286,7 +287,8 @@ debug_mode ifTrue:[
 inStream := FileStream open: filein 
                         mode: FileStream read.
 
-[fileout = nil] ifTrue: [
+fileout = nil 
+ifTrue: [
     outStream = stdout
 ] ifFalse: [
     outStream = FileStream open: fileout
@@ -307,7 +309,8 @@ freqtable keysAndValuesDo: [:key :value |
     ]
 ].
 
-[pqueue size > 1] whileTrue: [
+pqueue size > 1 
+whileTrue: [
    |lchild rchild tCount tChar| 
    lchild := pqueue removeFirst.
    rchild := pqueue removeFirst.
@@ -325,36 +328,35 @@ etree = nil ifFalse: [
 ].
 
 compress_and_print ifTrue: [
-  |char number bitstring count temp|
-   encodtable keysAndValuesDo: [:index :number |
-      (number notNil and: [number > 0]) ifTrue: [
-      
-      ((index > 32) & (index < 128)) ifTrue: [
-         char := (Character value: index).
-      ]
-      ifFalse: [
-         index = 256 ifTrue: [char := 'EOF']
-         ifFalse: [
-            char:= (Character value: index) asInteger radix: 16.
-            char := char copyFrom: 4 to: char size.
-            index < 16 ifTrue:[
-               char := ('x0', char).
+    |char number bitstring count temp|
+    encodtable keysAndValuesDo: [:index :number |
+        (number notNil and: [number > 0]) ifTrue: [
+            ((index > 32) & (index < 128)) ifTrue: [
+                char := (Character value: index).
             ]
             ifFalse: [
-               index < 33 ifTrue:[ char := ('x', char). ]
-            ]
-         ]
-      ].
-      bitstring := encodtable at: index.
-      count := 0. 
-      stdout << char.
-      char asString size to: 5 do: [:skip| stdout << ' '].
-      stdout << (freqtable at: index).
-      temp := (freqtable at: index). 
-      temp asString size to: 4 do: [:skip| stdout << ' '].
-      stdout << bitstring << nl.
-      ].
-   ].
+                index = 256 ifTrue: [char := 'EOF']
+                ifFalse: [
+                    char:= (Character value: index) asInteger radix: 16.
+                    char := char copyFrom: 4 to: char size.
+                    index < 16 ifTrue:[
+                    char := ('x0', char).
+                    ]
+                    ifFalse: [
+                    index < 33 ifTrue:[ char := ('x', char). ]
+                    ]
+                ]
+            ].
+            bitstring := encodtable at: index.
+            count := 0. 
+            stdout << char.
+            char asString size to: 5 do: [:skip| stdout << ' '].
+            stdout << (freqtable at: index).
+            temp := (freqtable at: index). 
+            temp asString size to: 4 do: [:skip| stdout << ' '].
+            stdout << bitstring << nl.
+        ].
+    ].
 ].
 
 compressing ifTrue: [
