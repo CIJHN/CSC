@@ -237,24 +237,28 @@ encodtable := ZeroArray new: 257.
 freqtable at:256 put:1.
 "parse command"
 (1 to: Smalltalk arguments size) do:[:index |
-arg:= (Smalltalk arguments at: index).
-arg= '-d' ifTrue: [isD := 1].
-arg= '-c' ifTrue: [isC := 1].
-arg= '-u' ifTrue: [isU := 1].
-arg= '-t' ifTrue: [isT := 1].
+  argu:= (Smalltalk arguments at: index).
+  (argu include: $-)
+  ifTrue:[
+  argu= '-d' ifTrue: [isD := 1].
+  argu= '-c' ifTrue: [isC := 1].
+  argu= '-u' ifTrue: [isU := 1].
+  argu= '-t' ifTrue: [isT := 1].
 ]
 "if not check for infile"
-ifFalse:[
+  ifFalse:[
   (infile ~= nil) ifFalse:[
     infile := argu.
-  ]
+  
 ]
 
 "if infile has been found, check outfile"
 ifTrue: [
   outfile := argu.
 ]
-
+]
+].
+]
 ifFalse: [
   stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
   ObjectMemory quit:1
