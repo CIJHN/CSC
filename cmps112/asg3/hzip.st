@@ -245,8 +245,8 @@ ifFalse: [
 
 | argu |
 (1 to: Smalltalk arguments size) do: [:index |
-    argu:= (Smalltalk arguments at: index).
-    (argu include: $-)
+    argu := (Smalltalk arguments at: index).
+    (argu ~ '-.+')
     ifTrue: [
         [argu = '-d'] ifTrue: [debug_mode := true].
         [argu = '-c'] ifTrue: [compressing := true].
