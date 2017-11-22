@@ -243,8 +243,8 @@ ifFalse: [
     ObjectMemory quit: 1.
 ].
 
+| argu |
 (1 to: Smalltalk arguments size) do: [:index |
-    | argu |
     argu:= (Smalltalk arguments at: index).
     (argu include: $-)
     ifTrue: [
