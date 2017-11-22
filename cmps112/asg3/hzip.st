@@ -299,10 +299,11 @@ ifTrue: [
 ]
 
 "----------compression------------"
+
 decompressing ifFalse:[
-    [inputfile atEnd not] whileTrue: [
+    [inStream atEnd not] whileTrue: [
         |ordChar|
-        ordChar := inputfile next asInteger.
+        ordChar := inStream next asInteger.
         freqtable incr: ordChar.
     ].
 
@@ -338,15 +339,16 @@ compress_and_print ifTrue: [
                 char := (Character value: index).
             ]
             ifFalse: [
-                index = 256 ifTrue: [char := 'EOF']
+                index = 256 
+                ifTrue: [char := 'EOF']
                 ifFalse: [
                     char:= (Character value: index) asInteger radix: 16.
                     char := char copyFrom: 4 to: char size.
                     index < 16 ifTrue:[
-                    char := ('x0', char).
+                        char := ('x0', char).
                     ]
                     ifFalse: [
-                    index < 33 ifTrue:[ char := ('x', char). ]
+                        index < 33 ifTrue:[ char := ('x', char). ]
                     ]
                 ]
             ].
@@ -363,60 +365,48 @@ compress_and_print ifTrue: [
 ].
 
 compressing ifTrue: [
-   |readfile|
-   readfile := FileStream open: infile
-                          mode: FileStream read.
-  
-   debug_mode ifTrue: [
-      (outputfile = nil) ifTrue: [
-         stdout << 'Writefile is nil. Printing to stdout.' << nl.
-      ]
-      ifFalse:[
-         stdout << 'Printing to ' << outfile << nl.
-      ].
-      stdout << '-------Compression-------' << nl.
-   ].
-   outputfile = nil
-   "if there is no outfile"
-   ifTrue: [
-      outputfile := stdout.
-   ]
-   ifFalse: [
-      outputfile := FileStream open: outfilename
-                              mode: FileStream write.
-   ].
+    | copybits bitrep |
+    debug_mode ifTrue: [
+        (outputfile = nil) ifTrue: [
+            stdout << 'Writefile is nil. Printing to stdout.' << nl.
+        ]
+        ifFalse:[
+            stdout << 'Printing to ' << outfile << nl.
+        ].
+        stdout << '-------Compression-------' << nl.
+    ].
    
-   bitrep := ''.
-   etree postorder: [:char :aleaf |
-      aleaf ifTrue:[
-         tempbit := ''.
-         char = 0 "if byte is 0"
-         ifTrue:[tempbit := '000000000']
-         ifFalse:[
-            char = 256 "if byte is EOF"
-            ifTrue:[tempbit := '000000001']
-            ifFalse:["if not 0 or 256, write from bit 7 to 0"
-               8 to: 1 by: -1 do: [:i |
-                  tempbit := tempbit, ((char bitAt: i) printString).
-               ]
+    bitrep := ''.
+    etree postorder: [:char :aleaf |
+        aleaf ifTrue: [
+            tempbit := ''.
+            char = 0
+            ifTrue: [tempbit := '000000000']
+            ifFalse: [
+                char = 256
+                ifTrue: [tempbit := '000000001']
+                ifFalse: [
+                    8 to: 1 by: -1 do: [:i |
+                        tempbit := tempbit, ((char bitAt: i) printString).
+                    ].
+                ].
             ].
-         ].
-         bitrep := (bitrep, '0', tempbit).
-      ]
-      ifFalse:[ "if not leaf"
-         bitrep := (bitrep, '1').
-      ].
-   ].
+            bitrep := (bitrep, '0', tempbit).
+        ]
+        ifFalse:[ "if not leaf"
+            bitrep := (bitrep, '1').
+        ].
+    ].
       "copy it into outfile"
-      copybits := OutBits new: outputfile.
-      1 to: (bitrep size) do: [:x |
+    copybits := OutBits new: outputfile.
+    1 to: (bitrep size) do: [:x |
         bitcopy := ((bitrep at: x) asInteger) - 48.
         copybits writeBit: bitcopy.
-      ].
-      copybits writeBit: 1.
+    ].
+    copybits writeBit: 1.
       "copy encoding value into outfile"
       "reopen the infile and write out the encoded version of each byte"
-      [readfile atEnd not] whileTrue: [
+    [readfile atEnd not] whileTrue: [
          |index bitwise code|
          index := readfile next asInteger.
          code := encodtable at: index.
@@ -424,14 +414,13 @@ compressing ifTrue: [
             bitwise := char asInteger - 48.
             copybits writeBit: bitwise.
          ].
-      ].
-      eoftrue := encodtable at: 256.
-      eoftrue do: [:char |
+    ].
+    eoftrue := encodtable at: 256.
+    eoftrue do: [:char |
          bitwise := char asInteger - 48.
          copybits writeBit: bitwise.
-      ].
-      copybits flushByte. 
-   ].
+    ].
+    copybits flushByte. 
 ].
 
 "-----------------------decompression--------------------------"
@@ -548,6 +537,7 @@ decompressing ifTrue: [
       ].
    ].
 ].
+
 inStream close.
 outStream ~= nil 
 ifTrue: [
