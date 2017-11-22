@@ -262,7 +262,7 @@ ifFalse: [
             ] ifFalse: [
                 stderr << 'error : Usage : hzip.st -dtcu inputfile [outputfile]' << nl.
                 ObjectMemory quit: 1.
-            ]
+            ].
         ].
     ].
 ].
