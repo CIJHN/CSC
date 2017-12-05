@@ -1,8 +1,28 @@
 #!/afs/cats.ucsc.edu/courses/cmps112-wm/usr/smalltalk/bin/gst -f
+"Start Code from example"
 
 nl := Character nl.
 FileStream extend [
    nl := Character nl.
+   catFile [
+      |count|
+      count := 0.
+      [self atEnd not] whileTrue: [
+         count := count + 1
+         count asString size to: 5 do: [:skip| stdout << ' '].
+         stdout << count << ': ' << self nextLine << nl.
+      ]
+   ]
+]
+ 
+Character extend [
+   isPrint [
+      ^ (Character space <= self) & (self <= $~)
+   ]
+   visible [
+      self isPrint ifTrue: [^ '$', self asString]
+                   ifFalse: [^ self asInteger printStringRadix: 8]
+   ]
 ]
 
 Object subclass: ZeroArray [
@@ -46,9 +66,9 @@ Object subclass: ZeroArray [
          aBlock value: index value: (self at: index).
       ]
    ]
-
 ]
 
+"Leaf subclass modified from tree.st"
 Object subclass: Leaf [
    |char count aleaf|
    char [ ^ char ]
@@ -88,11 +108,14 @@ Object subclass: Leaf [
       visitor value: char value: string.
    ]
 
+   "need a post-order traversal"
    postorder: visitor [
       visitor value: char value: aleaf.
    ]
 ]
 
+
+"-------------classes--------------"
 Leaf subclass: Tree [
    |left right|
 
@@ -104,17 +127,13 @@ Leaf subclass: Tree [
       |result|
       result := super new: aChar count: aCount.
       result setLeft: aLeft andRight: aRight.
-      ^ result
+      ^ result.
    ]
 
    setLeft: aLeft andRight: aRight [
       left := aLeft.
       right := aRight.
-      aleaf := false. "trees are not leaves"
    ]
-
-   right [ ^ right ]
-   left [ ^ left ]
 
    printOn: aStream [
       (self printBase: aStream) << ',' << left << ',' << right << ')'.
@@ -124,12 +143,13 @@ Leaf subclass: Tree [
       left inorder: visitor prefix: string, '0'.
       right inorder: visitor prefix: string, '1'.
    ]
-   
-   postorder: visitor [
+
+    postorder: visitor [
       left postorder: visitor. "left first"
       right postorder: visitor. "right next"
       visitor value: char value: aleaf.
    ]
+
 ]
 
 Object subclass: OutBits [
@@ -210,7 +230,6 @@ Object subclass: StreamWorker [
     outStream [ ^outStream. ]
 ]
 
-
 StreamWorker subclass: CompressorBase [
     | pqueue freqtable encodtable etree |
     
@@ -225,40 +244,39 @@ StreamWorker subclass: CompressorBase [
     tree [ ^etree. ]
 
     init: in out: o [
-        | inStream outStream priorityqueue |
+        | inStream outStream |
         super init: in out: o.
 
         inStream := self inStream.
         outStream := self outStream.
 
-        encodtable := ZeroArray new: 257.
+        pqueue := SortedCollection new.
         freqtable := ZeroArray new: 257.
-        priorityqueue := SortedCollection new.
-        freqtable at:256 put:1.
+        freqtable at: 256 put: 1.
+        encodtable := ZeroArray new: 257.
 
+       
         [inStream atEnd not] whileTrue: [
             |ordChar|
             ordChar := inStream next asInteger.
             freqtable incr: ordChar.
         ].
-
         freqtable keysAndValuesDo: [:key :value |
             (value notNil and: [value > 0]) ifTrue: [
-                priorityqueue add: (Leaf new: key count: value).
+                pqueue add: (Leaf new: key count: value).
             ]
         ].
-
-        [priorityqueue size > 1] whileTrue: [
-            |lchild rchild tCount tChar newTree|  
-            lchild := priorityqueue removeFirst.
-            rchild := priorityqueue removeFirst.
+        [pqueue size > 1] whileTrue: [
+            |lchild rchild tCount tChar newTree| 
+            lchild := pqueue removeFirst.
+            rchild := pqueue removeFirst.
             tChar := lchild char.
             tCount := (rchild count + lchild count).
-            newTree := Tree new: tChar count: tCount left: lchild right: rchild.
-            priorityqueue add: newTree.
+            newTree := Tree new: tChar 
+                count: tCount left: lchild right: rchild.
+            pqueue add: newTree.
         ].
-
-        etree := priorityqueue removeFirst.
+        etree := pqueue removeFirst.
         etree = nil ifFalse: [
             etree inorder: [:char :string |
                 encodtable at: char put: string.
@@ -266,7 +284,6 @@ StreamWorker subclass: CompressorBase [
         ].
     ]
 ]
-
 
 CompressorBase subclass: Inspector [
     Inspector class >> new: instream out: outstream [
@@ -318,33 +335,33 @@ CompressorBase subclass: Inspector [
     ]
 ]
 
-
 CompressorBase subclass: Compressor [
     Compressor class >> new: instream out: outstream [
         | result |
         result := super new: instream out: outstream.
         ^result.
     ]
+
     work [
-        |bitrep etree copybits bitcopy eoftrue encodingTable outStream bitwise|
-        etree = self tree.
-        encodingTable := self encodingTable.
+        | copybits bitrep outStream etree bitcopy eoftrue bitwise |
         outStream := self outStream.
+        etree := self tree.
 
         bitrep := ''.
         etree postorder: [:char :aleaf |
             aleaf ifTrue: [
                 | tempbit |
                 tempbit := ''.
-                char = 0 "if byte is 0"
-                ifTrue:[tempbit := '000000000']
-                ifFalse:[
-                    char = 256 "if byte is EOF"
-                    ifTrue:[tempbit := '000000001']
-                    ifFalse:["if not 0 or 256, write from bit 7 to 0"
-                    8 to: 1 by: -1 do: [:i |
-                        tempbit := tempbit, ((char bitAt: i) printString).
-                    ]
+                char = 0
+                ifTrue: [tempbit := '000000000']
+                ifFalse: [
+                    char = 256
+                    ifTrue: [tempbit := '000000001']
+                    ifFalse: [
+                        8 to: 1 by: -1 do: [:i |
+                            tempbit := tempbit, 
+                                ((char bitAt: i) printString).
+                        ].
                     ].
                 ].
                 bitrep := (bitrep, '0', tempbit).
@@ -353,25 +370,22 @@ CompressorBase subclass: Compressor [
                 bitrep := (bitrep, '1').
             ].
         ].
-        "copy it into outfile"
         copybits := OutBits new: outStream.
         1 to: (bitrep size) do: [:x |
             bitcopy := ((bitrep at: x) asInteger) - 48.
             copybits writeBit: bitcopy.
         ].
         copybits writeBit: 1.
-        "copy encoding value into outfile"
-        "reopen the infile and write out the encoded version of each byte"
         [inStream atEnd not] whileTrue: [
             |index code|
             index := inStream next asInteger.
-            code := encodingTable at: index.
+            code := encodtable at: index.
             code do: [:char |
                 bitwise := char asInteger - 48.
                 copybits writeBit: bitwise.
             ].
         ].
-        eoftrue := encodingTable at: 256.
+        eoftrue := encodtable at: 256.
         eoftrue do: [:char |
             bitwise := char asInteger - 48.
             copybits writeBit: bitwise.
@@ -380,103 +394,123 @@ CompressorBase subclass: Compressor [
     ]
 ]
 
-CompressorBase subclass: Decompressor [
+
+StreamWorker subclass: Decompressor [
+    
     Decompressor class >> new: instream out: outstream [
         | result |
         result := super new: instream out: outstream.
         ^result.
     ]
+
     work [
-        | stack bitsInFile eof bitChar reTree rootnode finished |
+        |stack reTree eof bitsInFile bitChar rootnode finished inStream outStream oneBits oneBit|
+        " copybits := OutBits new: writefile. "
+    
+        inStream := self inStream.
+        outStream := self outStream.
 
-        stack := OrderedCollection new.
-        bitsInFile := BitStream new: inStream.
-        eof := false.
-        bitChar := 0.
-        reTree := ''.
-        rootnode := ''.
-        finished := false.
-        [(bitsInFile atEnd not) & (eof not)] whileTrue:[
-            | oneBits oneBit |
-            bitChar := 0.
-            oneBits := bitsInFile nextBit.
+        "initialize stack"
+   "copybits := OutBits new: writefile."
+   
+   stack := OrderedCollection new.
+   bitsInFile := BitStream new: inStream.
+   eof := false.
+   bitChar := 0.
+   reTree := ''.
+   rootnode := ''.
+   finished := false.
+   "rebuild the tree."
+   [(bitsInFile atEnd not) & (eof not)] whileTrue:[
+      bitChar := 0.
+      oneBits := bitsInFile nextBit.
 
-            finished ifFalse:[
-                oneBits = 0 ifTrue:[
-                    8 to: 1 by: -1 do: [:bitindex |
-                    oneBit := bitsInFile nextBit.
-                    bitChar := bitChar bitAt: bitindex put: oneBit.
-                    ].
-                    bitChar = 0 ifTrue:[
-                    oneBit := bitsInFile nextBit.
-                    oneBit = 1 ifTrue:[
-                        bitChar := bitChar bitAt: 9 put: 1.
-                    ].
-                    ].
-            
-                stack add: (Leaf new: bitChar count: 0).
-                ].
-
-                oneBits = 1 ifTrue:[
-                    | righttr lefttr |
-                    righttr := stack removeLast.
-                    
-                    stack size = 0 ifTrue:[
-                    reTree := righttr.
-                    rootnode := reTree.
-                    finished := true.
-                    ]
-                    ifFalse:[
-                    | newTree |
-                    lefttr := stack removeLast.
-                    newTree := Tree new: 
-                    lefttr char count: 0 left: lefttr right: righttr.
-                    stack add: newTree.
-                    ].
-                ].
-            ]
-            ifTrue: [ "if tree has been reconstructed"
-                |echar|
-                (rootnode aleaf) ifTrue:[
-                    rootnode char = 256 ifTrue: [eof := true]
-                    ifFalse:[
-                    echar := Character value: rootnode char.
-                    outStream nextPut: echar.
-                    rootnode := reTree.
-                    ].
-                ]
-                ifFalse: [
-                    oneBits = 0 ifTrue: [
-                        rootnode := rootnode left.
-                        rootnode aleaf ifTrue:[
-                            eof not ifTrue:[
-                                rootnode char = 256 ifTrue: [eof := true]
-                            
-                                ifFalse: [
-                                    echar := Character value: rootnode char.
-                                    outStream nextPut: echar.
-                                    rootnode := reTree.
-                                ].
-                            ]
-                        ]
-                    ]
-                    "if not 0, check right"
-                    ifFalse: [
-                        rootnode := rootnode right.
-                        rootnode aleaf ifTrue:[
-                            rootnode char = 256 ifTrue: [eof := true]
-                            ifFalse:[
-                                echar := Character value: rootnode char.
-                                outStream nextPut: echar.
-                                rootnode := reTree.
-                            ]
-                        ]
-                    ].
-                ].
+      finished ifFalse:[
+         "if the bit is 0, read the next 8 bits"
+         oneBits = 0 ifTrue:[
+            8 to: 1 by: -1 do: [:bitindex |
+              oneBit := bitsInFile nextBit.
+              bitChar := bitChar bitAt: bitindex put: oneBit.
             ].
-        ].
-    ]
+            "if value is 0, read one more bit"
+            bitChar = 0 ifTrue:[
+               oneBit := bitsInFile nextBit.
 
+            "if it is 1, add 256 to bitchar"
+               oneBit = 1 ifTrue:[
+                  bitChar := bitChar bitAt: 9 put: 1.
+               ].
+            ].
+      
+         stack add: (Leaf new: bitChar count: 0).
+         ].
+
+         "if the bit is 1"
+         oneBits = 1 ifTrue:[
+             |righttr |
+            righttr := stack removeLast.
+            
+            "if that was the last tree"
+            stack size = 0 ifTrue:[
+               reTree := righttr.
+               rootnode := reTree.
+               finished := true.
+            ]
+            ifFalse:[
+                |lefttr newTree|
+               lefttr := stack removeLast.
+               newTree := Tree new: 
+               lefttr char count: 0 left: lefttr right: righttr.
+               stack add: newTree.
+            ].
+         ].
+      ]
+      ifTrue: [ "if tree has been reconstructed"
+      "part e"
+        |echar|
+         (rootnode aleaf) ifTrue:[
+
+            "if we've found the leaf eof, end loop"
+            rootnode char = 256 ifTrue: [eof := true]
+            ifFalse:[
+               echar := Character value: rootnode char.
+               outStream nextPut: echar.
+               rootnode := reTree.
+            ].
+         ]
+         "if not a leaf"
+         ifFalse: [
+            oneBits = 0 ifTrue: [
+               rootnode := rootnode left.
+               rootnode aleaf ifTrue:[
+                  eof not ifTrue:[
+                     rootnode char = 256 ifTrue: [eof := true]
+                  
+                     ifFalse: [
+                        echar := Character value: rootnode char.
+                        outStream nextPut: echar.
+                        rootnode := reTree.
+                     ].
+                  ]
+               ]
+            ]
+
+            "if not 0, check right"
+            ifFalse:[
+               rootnode := rootnode right.
+               rootnode aleaf ifTrue:[
+                  rootnode char = 256 ifTrue: [eof := true]
+                  ifFalse:[
+                     echar := Character value: rootnode char.
+                     outStream nextPut: echar.
+                     rootnode := reTree.
+                  ]
+               ]
+            ].
+         ].
+      ].
+   ].
+    ]
 ]
 
 
@@ -498,6 +532,7 @@ compressing := false.
 decompressing := false.
 filein := nil.
 fileout := nil.
+
 
 "parse command"
 (Smalltalk arguments size > 1) & (Smalltalk arguments size < 4)
