@@ -45,7 +45,6 @@ print_digits( Digits ) :-
    Digits < 10, 
    print( 0 ), print( Digits ).
 
-/* else, print the two digits */
 print_digits( Digits ) :-
    Digits >= 10,
    print( Digits ).
@@ -78,7 +77,19 @@ writepath([flight(Depart,Arrive,DTime)]|path):-
     writepath(Path).
 writepath(_).   
 
-listpath()
+
+listpath(Node, Node, _, [Node]).
+listpath(Node, End, [flight(PrevD, PrevA, PrevT)|Tried], [flight(Node, Next, DepartT)|Path]) :-
+   flight(Node, Next, DepartingTime),
+   arrive_time(flight(Node, Next, DepartingTime), ArrivalTime),
+   not(member(flight(Node, Next, DepartingTime), Tried)),
+   arrive_time(flight(PrevD, PrevA, PrevT), PrevArrival),
+   to_hour(DepartingTime, CurrentDepart),
+   Transfer is CurrentDepart - PrevArrival,
+   (CurrentDepart > PrevArrival),
+   (ArrivalTime < 24),
+   (Transfer > 0.5),
+   listpath(Next, End, [flight(Node, Next, DepartingTime)|Tried], Path).
 
 fly(Depart, Depart):-
     write('Error : Start terminal and '),
