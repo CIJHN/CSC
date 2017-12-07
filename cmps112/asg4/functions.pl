@@ -67,7 +67,7 @@ fly_time(Airp1, Airp2, FlyingTime) :-
     FlyingTime is DistanceMiles/500.
 
 
-writepath([flight(Depart,Arrive,DTime)]|path):-
+writepath([flight(Depart,Arrive,DTime)],path):-
     airport(Depart, DepartName, _, _), airport(Arrive, ArriveName, _, _),
     write('depart  '), write(Depart), write('  '), write(DepartName),
     write('  '), to_hour(DTime, DepartingTime), print_time(DepartingTime), nl,
@@ -79,7 +79,7 @@ writepath(_).
 
 
 listpath(Node, Node, _, [Node]).
-listpath(Node, End, [flight(PrevD, PrevA, PrevT)|Tried], [flight(Node, Next, DepartT)|Path]) :-
+listpath(Node, End, [flight(PrevD, PrevA, PrevT),Tried], [flight(Node, Next, DepartT),Path]) :-
    flight(Node, Next, DepartingTime),
    arrive_time(flight(Node, Next, DepartingTime), ArrivalTime),
    not(member(flight(Node, Next, DepartingTime), Tried)),
@@ -89,7 +89,7 @@ listpath(Node, End, [flight(PrevD, PrevA, PrevT)|Tried], [flight(Node, Next, Dep
    (CurrentDepart > PrevArrival),
    (ArrivalTime < 24),
    (Transfer > 0.5),
-   listpath(Next, End, [flight(Node, Next, DepartingTime)|Tried], Path).
+   listpath(Next, End, [flight(Node, Next, DepartingTime),Tried], Path).
 
 fly(Depart, Depart):-
     write('Error : Start terminal and '),
