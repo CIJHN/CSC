@@ -16,7 +16,7 @@ constants( List ) :-
 sincos( X, Y ) :-
    Y is sin( X ) ** 2 + cos( X ) ** 2.
 
-/* function to convert degrees to radians */
+
 degree_to_radians( degmin( Degrees, _), Radains ) :-
    Radians is ((Degree * pi)/ (180)).
 
@@ -40,14 +40,13 @@ distance (Airp1, Airp2, Distance) :-
 to_hour(time(Hour,Minute),TotalHour) :-
     TotalHour is Hour +Minute /60.
 
+print_digits( Digits ) :-
+   Digits >= 10,
+   print( Digits ).
 
 print_digits( Digits ) :-
    Digits < 10, 
    print( 0 ), print( Digits ).
-
-print_digits( Digits ) :-
-   Digits >= 10,
-   print( Digits ).
 
 print_time(TotalHour):-
     Totaltime is floor( TotalHour *60),
@@ -67,41 +66,39 @@ fly_time(Airp1, Airp2, FlyingTime) :-
     FlyingTime is DistanceMiles/500.
 
 
-writepath([flight(Depart,Arrive,DTime)],path):-
+print_path([flight(Depart,Arrive,DTime)],path):-
     airport(Depart, DepartName, _, _), airport(Arrive, ArriveName, _, _),
     write('depart  '), write(Depart), write('  '), write(DepartName),
     write('  '), to_hour(DTime, DepartingTime), print_time(DepartingTime), nl,
     write('arrive  '), write(Arrive), write('  '), write(ArriveName),
     write('  '), arrive_time(flight(Depart, Arrive, DTime), ArrivalTime),
     print_time(ArrivalTime), nl, !,
-    writepath(Path).
-writepath(_).   
+    print_path(Path).
+print_path(_).   
 
 
-listpath(Node, Node, _, [Node]).
-listpath(Node, End, [flight(PrevD, PrevA, PrevT),Tried], [flight(Node, Next, DepartT),Path]) :-
+list_path(Node, Node, _, [Node]).
+list_path(Node, End, [flight(PrevD, PrevA, PrevT),Tried], [flight(Node, Next, DepartT),Path]) :-
    flight(Node, Next, DepartingTime),
    arrive_time(flight(Node, Next, DepartingTime), ArrivalTime),
    not(member(flight(Node, Next, DepartingTime), Tried)),
    arrive_time(flight(PrevD, PrevA, PrevT), PrevArrival),
    to_hour(DepartingTime, CurrentDepart),
-   Transfer is CurrentDepart - PrevArrival,
-   (CurrentDepart > PrevArrival),
-   (ArrivalTime < 24),
-   (Transfer > 0.5),
-   listpath(Next, End, [flight(Node, Next, DepartingTime),Tried], Path).
+   TransferTime is CurrentDepart - PrevArrival,
+    (CurrentDepart > PrevArrival),
+    (TransferTime > 0.5),
+    (ArrivalTime < 24),
+   list_path(Next, End, [flight(Node, Next, DepartingTime),Tried], Path).
 
 fly(Depart, Depart):-
-    write('Error : Start terminal and '),
-    write('Destination terminal are the same.'),
+    write('Error : Start terminal and Destination terminal are the same.'),
     nl, !, fail.
 
 fly (Depart, Arrive ):-
     airport( Depart, _, _, _ ),
     airport( Arrive, _, _, _),
     write( 'There is no flight can fly from '),
-    write( Depart ), write(' to '),
-    write( Arrive ),
+    write( Depart ), write(' to '),write( Arrive ),
     write( ' or the flight cannot be finished in 24 hours'), nl,
     !, fail.
 
