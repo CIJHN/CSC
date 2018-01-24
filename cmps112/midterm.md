@@ -6,21 +6,24 @@ This document contains the possible knowledge for cmps112 midterm.
 
 ### Languages
 
-| Language   | Author                       | Features                                                     |
-| ---------- | ---------------------------- | ------------------------------------------------------------ |
-| Lisp       | John McCarthy                | dynamic-strong typed, functional                             |
-| Scheme     | Steele and Sussman           | dynamic-strong typed, functional                             |
-| Fortran    | John Backus and IBM          | static-weak typed, functional                                |
-| λ-calculus | Alonzo Church                | mathematics form                                             |
-| BASIC      | John Kemeny and Thomas Kurtz |                                                              |
-| COBOL      | Grace Hopper                 | designed for business data processing                        |
-| OCaml      |                              | static-strong typed, functional, OO, static type inference   |
-| Java       |                              | static-strong typed, OO                                      |
-| C          |                              | static-weak typed                                            |
-| C++        |                              | static-strong typed, OO, (someone think cpp is weak type...) |
-| make       |                              | a ‘‘little’’ language. (not turning complete!)               |
-
-
+| Language   | Author                       | Features                                                                                            |
+| ---------- | ---------------------------- | --------------------------------------------------------------------------------------------------- |
+| Lisp       | John McCarthy                | dynamic-strong typed, functional. List processing language with Lots of Idiotic Silly Parentheses.  |
+| Scheme     | Steele and Sussman           | dynamic-strong typed, functional                                                                    |
+| Fortran    | John Backus and IBM          | static-weak typed, functional. Numeric and scientific computation language developed at IBM (1957). |
+| λ-calculus | Alonzo Church                | mathematics form                                                                                    |
+| BASIC      | John Kemeny and Thomas Kurtz |                                                                                                     |
+| COBOL      | Grace Hopper                 | designed for business data processing                                                               |
+| OCaml      |                              | static-strong typed, functional, OO, static type inference                                          |
+| Java       |                              | static-strong typed, OO                                                                             |
+| C          |                              | static-weak typed                                                                                   |
+| C++        |                              | static-strong typed, OO, (someone think cpp is weak type...)                                        |
+| make       |                              | a ‘‘little’’ language. (not turning complete!)                                                  |
+| Pascal     | Niklaus Wirth                |                                                                                                     |
+| Simula 6   |                              | Simulation language that influenced the design of C++.                                              |
+| Haskell    |                              | Strong and Static                                                                                   |
+| PL/I       | IBM                          |                                                                                                     |
+| Algo 60    |                              | Backus-Naur Form, Designed in Europe to express algorithms in a structured way.                     |
 Lisp and Scheme are standard `functional programming language` (of course). They are based on `λ-calculus`
 
 ### Evaluation in strong typed language:
