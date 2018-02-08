@@ -1,0 +1,138 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    background: #f5f7fa;
+    position: relative;
+    min-height: 100%;
+    margin: 0 0 100px;
+    /* bottom = footer height */
+    font: 14px/24px "Gotham Rounded A", "Gotham Rounded B", "Gotham Rounded";
+}
+
+.header {
+    position: fixed;
+    display: block;
+    height: 50px;
+    width: 100%;
+    background-color: #576366;
+    left: 0;
+    top: 0;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, .2);
+}
+
+.header h2 {
+    height: 100%;
+    float: left;
+    padding: 12px 20px;
+    color: white;
+    margin: 0;
+}
+
+.header .pages {
+    height: 100%;
+    flex-flow: row nowrap;
+    float: right;
+}
+
+.header .pages .page {
+    height: 100%;
+    display: inline-flex;
+    padding: 12px 20px;
+    color: white;
+    font-size: 20px;
+}
+
+.header .pages a {
+    text-decoration: none;
+    color: white;
+}
+
+
+.header .pages .page:hover {
+    background-color: rgba(221, 221, 221, 0.06);
+}
+
+.avatar {
+    border-radius: 5px;
+    height: 200px;
+}
+
+.avatar.inline {
+    border-radius: 5px;
+    height: 200px;
+    display: inline-block;
+}
+
+.sidebar {
+    position: fixed;
+    min-height: 70%;
+    width: 180px;
+    z-index: 100;
+    margin: 10px;
+    background-color: white;
+    overflow-x: auto;
+    line-height: 30px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, .2);
+}
+
+.sidebar .item {
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, .1);
+    /* margin: 10px; */
+    padding: 10px;
+}
+
+.sidebar .item:hover {
+    background-color: rgba(0, 0, 0, .04);
+    cursor: pointer;
+}
+
+.sidebar .item:first-child {
+    border-top: none
+}
+
+.body {
+    height: 100%;
+    margin-top: 50px;
+    display: block;
+}
+
+.content {
+    /* min-height: 70vh; */
+    background: white;
+    padding: 10px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, .2);
+}
+
+.content-wrapper {
+    margin-left: 210px;
+    padding: 10px;
+    /* min-height: 70vh; */
+    /* min-height: 70%; */
+}
+
+.footer {
+    display: block;
+    text-decoration: none;
+    padding: 20px 0;
+    padding-right: -290px;
+    height: 20px;
+    width: 100%;
+}
+
+.footer-container {
+    float: right;
+    right: 0px;
+    padding-right: 20px;
+    color: #b2bbbd;
+}
+
+.footer-button {
+    text-decoration: none;
+    color: #5fcf80;
+    font-weight: 600;
+    font-size: 16px;
+}
