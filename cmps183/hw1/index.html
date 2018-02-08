@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>cmps183: Homework 1</title>
+</head>
+
+<body>
+    <header class="header">
+        <p>
+            cmps183: Homework 1
+        </p>
+    </header>
+
+    <div class="content">
+        DDD WTF
+    </div>
+    <footer class="footer">
+        <div class="footer-container">
+            <a href="#" class="footer-button">About Us</a> &nbsp;|&nbsp;
+            <a href="#" class="footer-button">Contact</a>&nbsp;|&nbsp;
+            <a href="#" class="footer-button">Privacy</a>&nbsp;|&nbsp;
+            <a href="#" class="footer-button">Credits</a>
+        </div>
+
+    </footer>
+</body>
+<style>
+    html {
+        position: relative;
+        min-height: 100%;
+    }
+
+    body {
+        margin: 0 0 100px;
+        /* bottom = footer height */
+        font: 14px/24px "Gotham Rounded A", "Gotham Rounded B", "Gotham Rounded";
+    }
+
+    .header {
+        position: absolute;
+        height: 50px;
+        width: 100%;
+        border-bottom: solid;
+        border-bottom-color: #576366;
+        background: #5fcf80;
+        left: 0;
+        top: 0;
+    }
+
+    .header p {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .content {
+        padding: 10px;
+        position: absolute;
+        top: 50px;
+    }
+
+    .footer-container {
+        position: absolute;
+        right: 0px;
+        color: #b2bbbd;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-around;
+    }
+
+    .footer-button {
+        text-decoration: none;
+        color: #5fcf80;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .footer {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        background-color: #576366;
+        text-decoration: none;
+        -webkit-font-smoothing: antialiased;
+
+        transform-origin: center center;
+        padding: 20px;
+        height: 20px;
+        width: 100%;
+    }
+</style>
+
+</html>
