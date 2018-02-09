@@ -2,8 +2,8 @@ import java.util.*;
 
 public class Code {
     public static void main(String[] args) {
-        // Code.PizzaProblem.run();
-        Mono.INSTANCE.run();
+        Code.PizzaProblem.run();
+        // Mono.INSTANCE.run();
     }
 
     public static enum Mono {
