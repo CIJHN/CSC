@@ -1,5 +1,18 @@
-console.log('on template')
-
+function createElement(tag, attrs, content, children) {
+    const e = document.createElement(tag);
+    if (content)
+        e.textContent = content;
+    if (attrs) {
+        for (const a in attrs) {
+            e.setAttribute(a, attrs[a]);
+        }
+    }
+    if (children) {
+        if (children instanceof Array) children.forEach(c => e.appendChild(c));
+        else e.appendChild(child)
+    }
+    return e;
+}
 const header = document.createElement('template');
 header.innerHTML = `
     <header class="header">
@@ -31,5 +44,19 @@ footer.innerHTML = `
     </div>
     `.trim();
 
-document.body.appendChild(header.content.firstChild)
-document.body.appendChild(footer.content.firstChild)
+const content = document.getElementsByClassName('content').item(0);
+const sidebar = document.getElementsByClassName('sidebar').item(0);
+
+const body = document.createElement('div');
+body.classList.add('body');
+body.appendChild(sidebar);
+const contentWrapper = document.createElement('div');
+contentWrapper.classList.add('content-wrapper');
+contentWrapper.appendChild(content);
+body.appendChild(contentWrapper);
+
+header.content.firstChild.style.zIndex = 100;
+document.body.appendChild(header.content)
+document.body.appendChild(body);
+document.body.appendChild(footer.content);
+

@@ -10,8 +10,125 @@
 </head>
 
 <body>
+    <div class="sidebar">
+        <div class="buttons">
+            <div class="item" onclick="showAll()">
+                Show All
+            </div>
+            <div class="item" onclick="showCompleted()">
+                Show Completed
+            </div>
+            <div class="item" onclick="showTodo()">
+                Show Todo
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <h1>Todo List</h1>
+        <hr>
+        <div class="todolist">
+        </div>
+    </div>
     <script src="./scripts/template.js"></script>
+    <script>
+        const ALL = 'all', TODO = 'todo', COMPLETED = 'compl';
+        let showing = 'all';
+        function renderItem(item) {
+            const root = createElement('div', { class: 'item' });
+            root.appendChild(createElement('div', { class: 'title' }, item.title));
+            root.appendChild(createElement('div', { class: 'note' }, item.note));
+            const label = createElement('label', { class: 'status' });
+            const input = createElement('input', { type: 'checkbox' });
+            if (item.status)
+                input.setAttribute('checked', '');
+            input.onchange = (event) => itemChange(event.target, root);
+            label.appendChild(input)
+            label.appendChild(document.createTextNode(' Done'))
+            root.appendChild(label);
+            root.appendChild(createElement('div', { class: 'due' }, item.due));
+            return root;
+        }
+        (function () {
+            const target = document.getElementsByClassName('todolist').item(0);
+            try {
+                JSON.parse(localStorage.getItem('allStatus'))
+                    .map(i => renderItem(i)).forEach(e => target.appendChild(e));
+            }
+            catch (e) {
+                console.error(e);
+                [{
+                    title: 'Do web homework',
+                    note: 'Analysis the MEHS element',
+                    due: 'Feb, 12, 129'
+                }, {
+                    title: 'toggle the hyper machine',
+                    note: 'remember the passcode',
+                    due: 'Feb'
+                }, {
+                    title: 'finish the TONEWS',
+                    note: 'Hard to realize that',
+                    due: 'Aug'
+                }, {
+                    title: 'Pipe on web',
+                    note: 'keep it safe',
+                    due: 'Aug'
+                }, {
+                    title: 'N',
+                    note: 'NP=P',
+                    due: 'No due'
+                }].map(e => renderItem(e)).forEach(e => target.appendChild(e));
+            }
+        })()
 
+        function itemChange(target, parent) {
+            switch (showing) {
+                case ALL:
+                    break;
+                case TODO:
+                    if (target.checked)
+                        parent.classList.add('hidden')
+                    break;
+                case COMPLETED:
+                    if (!target.checked)
+                        parent.classList.add('hidden')
+                    break;
+            }
+        }
+        function showAll() {
+            showing = ALL;
+
+            const todos = document.getElementsByClassName('todolist').item(0);
+            for (let i = 0; i < todos.children.length; ++i)
+                todos.children.item(i).classList.remove('hidden');
+
+        }
+        function showCompleted() {
+            showing = COMPLETED;
+            const todos = document.getElementsByClassName('todolist').item(0);
+            for (let i = 0; i < todos.children.length; ++i) {
+                const child = todos.children.item(i);
+                const input = child.getElementsByTagName('input').item(0);
+                if (input.checked) {
+                    child.classList.remove('hidden');
+                } else {
+                    child.classList.add('hidden');
+                }
+            }
+        }
+        function showTodo() {
+            showing = TODO;
+            const todos = document.getElementsByClassName('todolist').item(0);
+            for (let i = 0; i < todos.children.length; ++i) {
+                const child = todos.children.item(i);
+                const input = child.getElementsByTagName('input').item(0);
+                if (!input.checked) {
+                    child.classList.remove('hidden')
+                } else {
+                    child.classList.add('hidden')
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>
