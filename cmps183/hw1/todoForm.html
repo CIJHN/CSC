@@ -11,27 +11,87 @@
 
 <body>
     <div class="sidebar">
-
+        <div class="buttons">
+            <div class="item" onclick="showAll()">
+                Show All
+            </div>
+            <div class="item" onclick="showCompleted()">
+                Show Completed
+            </div>
+            <div class="item" onclick="showTodo()">
+                Show Todo
+            </div>
+        </div>
     </div>
 
     <div class="content">
-        <label>
-            Title: 
-            <input type="text">
-        </label>
-        <label>
-            Note:
-            <input class="input" type="text">
-        </label>
-        <label>
-            Due:
-            <input type="text">
-        </label>
-        <div class="button">
-            Submit
+        <h1>Todo Form</h1>
+        <hr>
+        <div style="margin-top: 20px;">
+            <label class="input">
+                Title
+                <input id="titleIn" type="text" onkeypress="handleKey(event)">
+            </label>
+            <label class="input">
+                Note
+                <input id="noteIn" type="text" onkeypress="handleKey(event)">
+            </label>
+            <label class="input">
+                Due
+                <input id="dueIn" type="date" onkeypress="handleKey(event)">
+            </label>
+            <div class="button" onclick="addTodo()">
+                Submit
+            </div>
+            <span id="warning" class="hidden" style="color: red">
+                Please enter the title!
+            </span>
         </div>
     </div>
     <script src="./scripts/template.js"></script>
+    <script src="./scripts/database.js"></script>
+    <script>
+        const warning = document.getElementById('warning');
+        function handleKey(event) {
+            if (event.key === 'Enter')
+                addTodo();
+        }
+        function addTodo() {
+            const titleIn = document.getElementById('titleIn'),
+                noteIn = document.getElementById('noteIn'),
+                dueIn = document.getElementById('dueIn');
+            if (titleIn.value === '') {
+                warning.classList.remove('hidden');
+                return;
+            }
+
+            let due;
+            try {
+                due = stod(dueIn.value);
+            } catch (e) {
+                due = new Date();
+                due.setDate(due.getDate() + 2);
+                due = due.getTime();
+            }
+            warning.classList.add('hidden');
+            const time = Date.now();
+            const item = {
+                id: time,
+                title: titleIn.value,
+                note: noteIn.value,
+                due,
+                post: time,
+                update: time,
+                status: false,
+            };
+
+            titleIn.value = ''
+            noteIn.value = ''
+            dueIn.value = ''
+
+            DB.push(item);
+        }
+    </script>
 </body>
 
 </html>

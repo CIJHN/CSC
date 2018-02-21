@@ -9,7 +9,7 @@ function createElement(tag, attrs, content, children) {
     }
     if (children) {
         if (children instanceof Array) children.forEach(c => e.appendChild(c));
-        else e.appendChild(child)
+        else e.appendChild(children)
     }
     return e;
 }
@@ -17,7 +17,7 @@ const header = document.createElement('template');
 header.innerHTML = `
     <header class="header">
         <h2>
-            CMPS183: Homework 1
+            CMPS183: Homework 2
         </h2>
         <div class="pages">
             <span class="page">
@@ -60,3 +60,34 @@ document.body.appendChild(header.content)
 document.body.appendChild(body);
 document.body.appendChild(footer.content);
 
+
+function hnode(tag, option, children) {
+    if (!option) option = {};
+    const e = document.createElement(tag);
+    if (option.text) {
+        e.textContent = option.text;
+    }
+    if (option.attrs) {
+        for (const a in attrs)
+            e.setAttribute(a, attrs[a]);
+    }
+    if (option.fields) {
+        Object.keys(option.fields).forEach((key) => {
+            e[key] = option.fields[key];
+        })
+    }
+    if (children) {
+        if (children instanceof Array)
+            children.forEach(c => e.appendChild(c));
+        else e.appendChild(children)
+    }
+    return e;
+}
+
+function stod(s) {
+    const d = s.split('-');
+    date = Date.UTC(Number.parseInt(d[0]),
+        Number.parseInt(d[1]) - 1,
+        Number.parseInt(d[2]) + 1);
+    return date;
+}

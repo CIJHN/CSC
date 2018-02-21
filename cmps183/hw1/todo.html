@@ -25,90 +25,191 @@
     </div>
     <div class="content">
         <h1>Todo List</h1>
+        <div>Sort By:
+            <select onchange="updateSort(event.target.value)">
+                <option value="post">Post Date</option>
+                <option value="due">Due Date</option>
+                <option value="update">Last Updated</option>
+            </select>
+            in
+            <select onchange="updateOrder(event.target.value)">
+                <option value="acc">Ascending</option>
+                <option value="dec">Descending</option>
+            </select>
+        </div>
         <hr>
         <div class="todolist">
+            <div class="item">
+                <div class="edit" style="cursor:auto"></div>
+                <div class="title">
+                    Title
+                </div>
+                <div class="note">
+                    Note
+                </div>
+                <div class="status" style="cursor:auto; text-align:left; padding-left:7px;">
+                    Status
+                </div>
+                <div class="post" style="text-align:left">
+                    Post Date
+                </div>
+                <div class="update" style="text-align:left">
+                    Last Updated
+                </div>
+                <div class="due" style="text-align:left">
+                    Due Date
+                </div>
+            </div>
         </div>
     </div>
     <script src="./scripts/template.js"></script>
+    <script src="./scripts/database.js"></script>
     <script>
         const ALL = 'all', TODO = 'todo', COMPLETED = 'compl';
+        const target = document.getElementsByClassName('todolist').item(0);
         let showing = 'all';
+        let sortBy = 'post';
+        let sortOrder = 'acc'
+        function createCheckMark() {
+            const e = document.createElement('div');
+            e.innerHTML =
+                `<svg class="checkmark" viewBox="0 0 40 40">
+                <path fill="none" d="M7.1 20.2l7.1 7.2 16.7-16.8" />
+            </svg>`;
+            return e.firstChild;
+        }
+        function sortTodo() {
+            const chi = target.children;
+            const arr = []
+            for (let i = 0; i < chi.length; ++i) arr.push(chi.item(i));
+            const cmp = sortOrder === 'acc'
+                ? (a, b) =>
+                    Number.parseInt(a.getAttribute(sortBy))
+                    - Number.parseInt(b.getAttribute(sortBy))
+                : (a, b) =>
+                    - Number.parseInt(a.getAttribute(sortBy))
+                    + Number.parseInt(b.getAttribute(sortBy))
+            arr.sort(cmp).forEach(d => target.appendChild(d));
+        }
+
+        function updateSort(sort) {
+            if (sort === sortBy) return;
+            sortBy = sort;
+            sortTodo();
+        }
+        function updateOrder(order) {
+            if (sortOrder === order) return;
+            sortOrder = order;
+            sortTodo();
+        }
+        function dtoString(d) { return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getDate()}` }
+
         function renderItem(item) {
-            const root = createElement('div', { class: 'item' });
-            root.appendChild(createElement('div', { class: 'title' }, item.title));
-            root.appendChild(createElement('div', { class: 'note' }, item.note));
-            const label = createElement('label', { class: 'status' });
-            const input = createElement('input', { type: 'checkbox' });
-            if (item.status)
-                input.setAttribute('checked', '');
-            input.onchange = (event) => itemChange(event.target, root);
-            label.appendChild(input)
-            label.appendChild(document.createTextNode(' Done'))
-            root.appendChild(label);
-            root.appendChild(createElement('div', { class: 'due' }, item.due));
+            const root = createElement('div', { class: 'item', id: `todo-${item.id}`, due: item.due, post: item.post, update: item.update });
+            const deleteDiv = createElement('div', { class: 'cross-shape delete' });
+            deleteDiv.onclick = (event) => {
+                DB.splice(DB.indexOf(item), 1);
+                target.removeChild(root);
+            }
+            root.appendChild(deleteDiv);
+
+            const inputs = []
+
+            const createDateInput = (time, field) => {
+                const e = createElement('input', { type: 'date', class: 'item-input', readonly: '' });
+                e.value = dtoString(new Date(time));
+                e.onchange = () => {
+                    item[field] = stod(e.value);
+                    root.setAttribute(field, item[field]);
+                    sortTodo();
+                }
+                return e;
+            }
+
+            let lastUpdateInput;
+            const postDateDiv = createElement('div', { class: 'post' }, undefined, createDateInput(item.post, 'post'));
+            const lastUpdateDiv = createElement('div', { class: 'update' }, undefined, lastUpdateInput = createDateInput(item.update, 'update'));
+            const dueDateDiv = createElement('div', { class: 'due' }, undefined, createDateInput(item.due, 'due'));
+            inputs.push(dueDateDiv.firstChild);
+
+            const edit = createElement('div', { class: 'edit' }, 'Edit');
+            root.appendChild(edit);
+            edit.onclick = (e) => {
+                inputs.forEach(i => {
+                    if (i.hasAttribute('readonly')) {
+                        i.removeAttribute('readonly');
+                        edit.textContent = 'Save'
+                    } else {
+                        i.setAttribute('readonly', '');
+                        edit.textContent = 'Edit'
+                        item.update = Date.now();
+                        lastUpdateInput.value = dtoString(new Date(item.date));
+                    }
+                })
+                sortTodo();
+            }
+
+            const createInput = (content, key) => {
+                const inp = createElement('input', { type: 'text', class: 'item-input', readonly: '' });
+                inp.value = content;
+                inp.onchange = () => {
+                    item[key] = inp.value;
+                }
+                inputs.push(inp)
+                return inp;
+            }
+
+            root.appendChild(createElement('div', { class: 'title' }, undefined, createInput(item.title, 'title')));
+            root.appendChild(createElement('div', { class: 'note' }, undefined, createInput(item.note, 'note')));
+
+            const status = createElement('label', { class: 'status' });
+            const doneInput = createElement('input', { type: 'checkbox' })
+            status.appendChild(doneInput);
+            if (item.status) {
+                doneInput.checked = true;
+                status.classList.add('done')
+                root.setAttribute('done', '');
+            }
+            status.onclick = (event) => {
+                item.status = doneInput.checked;
+                if (item.status) {
+                    root.setAttribute('done', '');
+                    status.classList.add('done');
+                } else {
+                    status.classList.remove('done');
+                    root.removeAttribute('done')
+                }
+                switch (showing) {
+                    case TODO:
+                        if (item.status)
+                            root.classList.add('hidden')
+                        break;
+                    case COMPLETED:
+                        if (!item.status)
+                            root.classList.add('hidden')
+                        break;
+                }
+            };
+            root.appendChild(status);
+
+            root.appendChild(postDateDiv);
+            root.appendChild(lastUpdateDiv);
+            root.appendChild(dueDateDiv);
             return root;
         }
-        (function () {
-            const target = document.getElementsByClassName('todolist').item(0);
-            try {
-                JSON.parse(localStorage.getItem('allStatus'))
-                    .map(i => renderItem(i)).forEach(e => target.appendChild(e));
-            }
-            catch (e) {
-                console.error(e);
-                [{
-                    title: 'Do web homework',
-                    note: 'Analysis the MEHS element',
-                    due: 'Feb, 12, 129'
-                }, {
-                    title: 'toggle the hyper machine',
-                    note: 'remember the passcode',
-                    due: 'Feb'
-                }, {
-                    title: 'finish the TONEWS',
-                    note: 'Hard to realize that',
-                    due: 'Aug'
-                }, {
-                    title: 'Pipe on web',
-                    note: 'keep it safe',
-                    due: 'Aug'
-                }, {
-                    title: 'N',
-                    note: 'NP=P',
-                    due: 'No due'
-                }].map(e => renderItem(e)).forEach(e => target.appendChild(e));
-            }
-        })()
 
-        function itemChange(target, parent) {
-            switch (showing) {
-                case ALL:
-                    break;
-                case TODO:
-                    if (target.checked)
-                        parent.classList.add('hidden')
-                    break;
-                case COMPLETED:
-                    if (!target.checked)
-                        parent.classList.add('hidden')
-                    break;
-            }
-        }
         function showAll() {
             showing = ALL;
-
-            const todos = document.getElementsByClassName('todolist').item(0);
-            for (let i = 0; i < todos.children.length; ++i)
+            const todos = target;
+            for (let i = 1; i < todos.children.length; ++i)
                 todos.children.item(i).classList.remove('hidden');
-
         }
         function showCompleted() {
             showing = COMPLETED;
-            const todos = document.getElementsByClassName('todolist').item(0);
-            for (let i = 0; i < todos.children.length; ++i) {
+            const todos = target;
+            for (let i = 1; i < todos.children.length; ++i) {
                 const child = todos.children.item(i);
-                const input = child.getElementsByTagName('input').item(0);
-                if (input.checked) {
+                if (child.hasAttribute('done')) {
                     child.classList.remove('hidden');
                 } else {
                     child.classList.add('hidden');
@@ -117,17 +218,17 @@
         }
         function showTodo() {
             showing = TODO;
-            const todos = document.getElementsByClassName('todolist').item(0);
-            for (let i = 0; i < todos.children.length; ++i) {
+            const todos = target;
+            for (let i = 1; i < todos.children.length; ++i) {
                 const child = todos.children.item(i);
-                const input = child.getElementsByTagName('input').item(0);
-                if (!input.checked) {
+                if (!child.hasAttribute('done')) {
                     child.classList.remove('hidden')
                 } else {
                     child.classList.add('hidden')
                 }
             }
         }
+        DB.map(e => renderItem(e)).forEach(e => target.appendChild(e));
     </script>
 </body>
 
