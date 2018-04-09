@@ -1,0 +1,283 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    background: #f5f7fa;
+    position: relative;
+    font-size: 14px;
+    color: #333;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.courses {
+    margin: 5px;
+    list-style: none;
+    /* display: inline-block; */
+}
+
+.courses .course {
+    white-space: normal;
+}
+
+.course div {
+    display: inline-block;
+    white-space: normal;
+}
+
+.info {
+    margin: 10px;
+    display: inline-block;
+    height: 100%;
+    line-height: 30px;
+}
+
+.course .number.elem {
+    background: #5fcf80;
+    border: 1.5px solid #5fcf80;
+    color: white;
+}
+
+hr {
+    border: 1px solid #eee;
+}
+
+.course .elem {
+    margin: 2px;
+    border: 1px solid rgba(0, 0, 0, .2);
+    padding: 1px 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.course .elem:hover {
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, .2);
+}
+
+.header {
+    position: fixed;
+    display: block;
+    height: 50px;
+    width: 100%;
+    background-color: #576366;
+    left: 0;
+    top: 0;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, .2);
+    /* text-transform: uppercase; */
+}
+
+.header h2 {
+    height: 100%;
+    float: left;
+    padding: 12px 20px;
+    color: white;
+    margin: 0;
+}
+
+.header .pages {
+    height: 100%;
+    flex-flow: row nowrap;
+    float: right;
+}
+
+.header .pages .page {
+    height: 100%;
+    display: inline-flex;
+    padding: 12px 20px;
+    color: white;
+    font-size: 20px;
+}
+
+.header .pages a {
+    text-decoration: none;
+    color: white;
+}
+
+.header .pages .page:hover {
+    background-color: rgba(221, 221, 221, 0.06);
+}
+
+.avatar {
+    border-radius: 5px;
+    height: 200px;
+}
+
+.avatar.inline {
+    border-radius: 5px;
+    height: 200px;
+    display: inline-block;
+}
+
+.sidebar {
+    position: fixed;
+    min-height: 70%;
+    width: 180px;
+    z-index: 100;
+    margin: 10px;
+    background-color: white;
+    overflow-x: auto;
+    line-height: 30px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, .2);
+}
+
+.sidebar .item {
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, .1);
+    /* margin: 10px; */
+    padding: 10px;
+}
+
+.sidebar .item:hover {
+    background-color: rgba(0, 0, 0, .04);
+    cursor: pointer;
+}
+
+.sidebar .item:first-child {
+    border-top: none
+}
+
+.body {
+    height: 100%;
+    margin-top: 70px;
+    display: block;
+}
+
+.content {
+    height: 100%;
+    background: white;
+    margin: .5rem 0 1rem 0;
+    padding: 20px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, .2);
+}
+
+.right {
+    float: right;
+}
+
+.footer {
+    display: block;
+    text-decoration: none;
+    padding: 20px 0;
+    padding-right: -290px;
+    height: 20px;
+    width: 100%;
+}
+
+.footer-container {
+    float: right;
+    right: 0px;
+    padding-right: 20px;
+    color: #b2bbbd;
+}
+
+.footer-button {
+    text-decoration: none;
+    color: #5fcf80;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.buttons {
+    margin: 15px 0;
+}
+
+.button {
+    display: inline;
+    padding: 10px;
+    margin-right: 5px;
+    background: transparent;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, .2);
+    cursor: pointer;
+}
+
+.button:hover {
+    filter: brightness(90%);
+}
+
+.button:active {
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, .2);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.input {
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 5px;
+    padding: 10px;
+    padding-right: 0;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.input input {
+    border: none;
+    border-left: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 0;
+}
+
+input {
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.item-input {
+    border: none;
+    background: transparent;
+    width: 95%;
+}
+
+.cross-shape {
+    display: inline-block!important;
+    position: relative;
+    width: 15px;
+    height: 15px;
+    border-radius: 100%;
+    background-color: #666666;
+    /* border: calc(15px/8) solid #666666; */
+    box-sizing: content-box
+}
+
+.cross-shape:before {
+    position: absolute;
+    content: '';
+    margin: auto;
+    width: calc(15px/8);
+    height: calc(15px/1.5);
+    background-color: #fff;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: rotate(45deg)
+}
+
+.cross-shape:after {
+    position: absolute;
+    content: '';
+    margin: auto;
+    width: calc(15px/1.5);
+    height: calc(15px/8);
+    background-color: #fff;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: rotate(45deg)
+}
+
+.checkmark {
+    stroke: white;
+    width: 40px;
+    height: 40px;
+    display: block;
+    stroke-width: 2.6;
+    stroke-miterlimit: 10;
+    stroke-dashoffset: 0;
+}

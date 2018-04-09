@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+
+    <link rel="stylesheet" href="./css/style.css">
+    <title>CMPS183: Homework 4</title>
+</head>
+
+<body>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="nav-wrapper">
+                <a href="#" class="brand-logo">&nbsp;&nbsp; CMPS183: Homework 4</a>
+                <ul id="nav-mobile" class="right hide-on-med-and-down">
+                    <li>
+                        <a href="/index">Home</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <div class="row" style="width:100%; margin-top:20px;">
+        <div class="col s3 l3">
+            <ul class="collapsible popout" data-collapsible="accordion">
+                <li>
+                    <div class="collapsible-header">
+                        <i class="material-icons">format_list_bulleted</i>
+                        About the Todo list
+                    </div>
+                    <div class="collapsible-body">
+                        <span>The list is fine... but actual implementation is kind of complicated</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="collapsible-header">
+                        <i class="material-icons">apps</i>
+                        About the SPA
+                    </div>
+                    <div class="collapsible-body">
+                        <span>Implementing a SPA is easier to do with a framework like Vue.js. In current date, the front end frameworks are majorly solving the SPA problem.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="col s9 l9" style="padding-right:30px;">
+            <div id="content" class="content">
+                <div class="row">
+                    <form id="sortForm" action="/index" method="GET" class="col s12">
+                        <div class="row">
+                            <div class="input-field col s3">
+                                <select name="sort" onchange="updateSort(event)">
+                                    <option value="post" :selected="sort==='post'">Post Date</option>
+                                    <option value="due" :selected="sort=='due'">Due Date</option>
+                                    <option value="updated" :selected="sort=='updated'">Last Updated</option>
+                                </select>
+                                <label>Sort</label>
+                            </div>
+                            <div class="input-field col s3">
+                                <select name="order" onchange="updateSort(event)">
+                                    <option value="ASC" :selected="order=='ASC'">Ascending</option>
+                                    <option value="DESC" :selected="order=='DESC'">Descending</option>
+                                </select>
+                                <label>Sort Order</label>
+                            </div>
+                            <div class="input-field col s3">
+                                <select name="filter" onchange="updateSort(event)">
+                                    <option value="all" :selected="filter=='all'">Show All</option>
+                                    <option value="completed" :selected="filter=='completed'">Show Completed</option>
+                                    <option value="todos" :selected="filter=='todos'">Show Todos</option>
+                                </select>
+                                <label>Filter</label>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="col s12 m12" v-for="i in sorted">
+                        <div class="card blue-grey darken-1 hoverable">
+                            <div class="card-content white-text">
+                                <span class="card-title" v-if="!i.editing">
+                                    {{i.title}}
+                                    <span class="right tooltipped" data-position="top" data-tooltip="Due Date">{{new Date(i.due).toLocaleString()}}</span>
+                                </span>
+                                <span v-if="!i.editing" class="right tooltipped" data-position="top" data-tooltip="Last Updated Date">{{new Date(i.update).toLocaleString()}}</span>
+                                <p v-if="!i.editing">
+                                    {{i.note}}
+                                </p>
+                                <span v-if="!i.editing" class="right tooltipped" data-position="top" data-tooltip="Post Date">{{new Date(i.post).toLocaleString()}}</span>
+                                <span v-if="i.editing" class="row">
+                                    <div class="input-field col s12">
+                                        <input type="text" name="title" form="editForm" class="validate" v-model="i.editingData.title">
+                                        <label for="input_title">Title</label>
+                                    </div>
+                                    <div class="input-field col s12">
+                                        <textarea id="input_note" type="text" name="note" form="editForm" class="materialize-textarea" v-model="i.editingData.note"></textarea>
+                                        <label for="input_note">Note</label>
+                                    </div>
+                                    <div class="col s6">
+                                        <label for="input_due_date">Due Date</label>
+                                        <input :id="i.id + 'Date'" type="text" class="datepicker" v-model="i.editingData.dueDate">
+                                    </div>
+                                    <div class="col s6">
+                                        <label for="input_due_time">Due Time</label>
+                                        <input :id="i.id + 'Time'" type="text" class="timepicker" v-model="i.editingData.dueTime">
+                                    </div>
+                                </span>
+
+                            </div>
+                            <div class="card-action">
+                                <a style="cursor:pointer;" href="#edit" @click="editItem(i)">{{ i.editing ? "Save" : "Edit" }}</a>
+                                <a class="modal-trigger" v-if="!i.editing" href="#deleteModal" @click="deleteItem(i)">Delete</a>
+                                <a class="right" @click="cancelEditItem(i)" style="margin-right:0px; cursor: pointer;" v-if="i.editing">Cancel</a>
+                                <a class="right" v-if="!i.editing" style="margin-right:0px; cursor:pointer;" @click="toggleItem(i)">{{i.status === 1 ? "Mark as TODO" : "Mark As Finish"}}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fixed-action-btn">
+                    <a class="waves-effect waves-light btn-floating btn-large red" @click="newItem">
+                        <i class="large material-icons">add</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="page-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="white-text">Frameworks</h5>
+                    <p class="grey-text text-lighten-4">This project uses Vue.js and Materialize to build the fancy UI.</p>
+                </div>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li>
+                            <a class="grey-text text-lighten-3" href="#!">About Us</a>
+                        </li>
+                        <li>
+                            <a class="grey-text text-lighten-3" href="#!">Contact</a>
+                        </li>
+                        <li>
+                            <a class="grey-text text-lighten-3" href="#!">Privacy</a>
+                        </li>
+                        <li>
+                            <a class="grey-text text-lighten-3" href="#!">Credits</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2018 Copyright CI010
+                <a class="grey-text text-lighten-4 right" href="https://www.github.com/ci010">Github</a>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script type="text/javascript" src="scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="scripts/materialize.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.collapsible').collapsible();
+        });
+        const app = new Vue({
+            el: '#content',
+            data: {
+                loading: false,
+                items: [],
+                sort: 'post',
+                order: 'ASC',
+                filter: 'all',
+            },
+            computed: {
+                sorted() {
+                    const sortedBy = this.sort;
+                    const order = this.order;
+                    const filter = this.filter === 'all' ? i => i :
+                        this.filter === 'todos' ? i => i.status === 0 :
+                            i => i.status === 1;
+                    console.log('resourt')
+                    return this.items.filter(filter).sort((a, b) =>
+                        order === 'ASC' ?
+                            a[sortedBy] - b[sortedBy] :
+                            b[sortedBy] - a[sortedBy]
+                    )
+                }
+            },
+            watch: {
+                sort() {
+                    console.log(this.sort);
+                }
+            },
+            methods: {
+                changeSort(ev) {
+                    console.log(ev)
+                },
+                formatDate(date) {
+                    const monthNames = [
+                        "January", "February", "March",
+                        "April", "May", "June", "July",
+                        "August", "September", "October",
+                        "November", "December"
+                    ];;
+                    return `${date.getDate()} ${monthNames[date.getMonth()]}, ${date.getFullYear()}`
+                },
+                formatTime(date) {
+                    let hour = date.getHours()
+                    if (hour < 10) hour = `0${hour}`
+                    let min = date.getMinutes()
+                    if (min < 10) min = `0${min}`
+                    return `${hour}:${min}`
+                },
+                refreshEditUI() {
+                    $('#input_note').trigger('autoresize');
+                    Materialize.updateTextFields();
+                    $('.datepicker').pickadate({
+                        selectMonths: true, // Creates a dropdown to control month
+                        selectYears: 15, // Creates a dropdown of 15 years to control year,
+                        today: 'Today',
+                        clear: 'Clear',
+                        close: 'Ok',
+                        closeOnSelect: false // Close upon selecting a date,
+                    });
+                    $('.timepicker').pickatime({
+                        default: 'now', // Set default time: 'now', '1:30AM', '16:30'
+                        fromnow: 0,       // set default time to * milliseconds from now (using with default = 'now')
+                        twelvehour: false, // Use AM/PM or 24-hour format
+                        donetext: 'OK', // text for done-button
+                        cleartext: 'Clear', // text for clear-button
+                        canceltext: 'Cancel', // Text for cancel-button
+                        autoclose: false, // automatic close timepicker
+                        ampmclickable: true, // make AM PM clickable
+                        aftershow: function () { } //Function for after opening timepicker
+                    });
+                },
+                newItem() {
+                    const now = Date.now();
+                    const fresh = {
+                        fresh: true,
+                        editing: true,
+                        id: '',
+                        title: '',
+                        note: '',
+                        due: 0,
+                        update: 0,
+                        status: '',
+                        post: 0,
+                        editingData: {
+                            title: "Please Enter the Todo Title",
+                            note: "Please Enter the description",
+                            dueDate: '',
+                            dueTime: ''
+                        }
+                    }
+                    this.items.unshift(fresh);
+                    Vue.nextTick(() => {
+                        this.refreshEditUI();
+                    })
+                },
+                cancelEditItem(i) {
+                    if (i.fresh) {
+                        Vue.delete(this.items, this.items.indexOf(i))
+                    }
+                    i.editing = false;
+                },
+                editItem(i) {
+                    const self = this;
+                    if (i.editing) {
+                        const path = i.fresh ? '/new' : `/edit/${i.id}`;
+
+                        const epcho = Date.parse(`${$(`#${i.id}Date`).first().val()} ${$(`#${i.id}Time`).first().val()}`);
+                        i.editingData.due = epcho;
+
+                        fetch(path, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-type': 'application/json'
+                            },
+                            body: JSON.stringify(i.editingData),
+                            method: 'POST',
+                        }).then(resp => resp.json())
+                            .then((newItem) => {
+                                i.id = newItem.id;
+                                i.title = newItem.title;
+                                i.note = newItem.note;
+                                i.due = newItem.due;
+                                i.update = newItem.update;
+                                i.status = newItem.status;
+                                i.fresh = false;
+                            });
+                        i.editing = false;
+                    } else {
+                        i.editing = true;
+                        const dateObj = new Date(i.due);
+                        const date = this.formatDate(dateObj)
+                        const time = this.formatTime(dateObj)
+                        i.editingData = {
+                            title: i.title,
+                            note: i.note,
+                            due: i.due,
+                            dueDate: date,
+                            dueTime: time,
+                        };
+                        Vue.nextTick(() => {
+                            self.refreshEditUI()
+                        })
+                    }
+                },
+                deleteItem(i) {
+                    const self = this;
+                    fetch(`/delete/${i.id}`, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-type': 'application/json'
+                        },
+                        method: 'POST',
+                    }).then(resp => resp.json())
+                        .then(() => {
+                            Vue.delete(self.items, self.items.indexOf(i))
+                        });
+                },
+                toggleItem(i) {
+                    const self = this;
+                    fetch(`/toggle/${i.id}`, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-type': 'application/json'
+                        },
+                        method: 'POST',
+                    }).then(resp => resp.json())
+                        .then(resp => {
+                            i.status = resp.status;
+                        })
+                },
+
+            },
+            mounted() {
+                const self = this;
+                fetch('/list', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-type': 'application/json'
+                    }
+                }).then(resp => resp.json())
+                    .then((ls) => {
+                        self.items = ls.map(e => {
+                            e.editing = false;
+                            return e;
+                        });
+                        Vue.nextTick(() => {
+                            $('.tooltipped').tooltip({ delay: 50, html: true });
+                        })
+                        console.log(self.items)
+                    })
+                    .catch(e => {
+                        console.error(e)
+                    })
+            },
+        })
+        $(document).ready(function () {
+            $('select').material_select();
+        });
+        function updateSort(event) {
+            app[event.target.name] = event.target.value;
+        }
+    </script>
+</body>
+
+</html>
