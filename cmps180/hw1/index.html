@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Draw a point with a mouse click</title>
+</head>
+
+<body onload="main()">
+  <input type="range" min="1" max="100" step="1" name="" id="sizer">
+  <canvas id="webgl" width="400" height="400" oncontextmenu="return false;">
+    Please use a browser that supports "canvas"
+  </canvas>
+
+  <script src="./lib/webgl-utils.js"></script>
+  <script src="./lib/webgl-debug.js"></script>
+  <script src="./lib/cuon-utils.js"></script>
+  <script src="./lib/load-file.js"></script>
+
+  <script id="vertexShader" type="x-shader/x-vertex" src="shaders/basic.vert"></script>
+  <script id="fragmentShader" type="x-shader/x-fragment" src="shaders/basic.frag"></script>
+  <script src="index.js"></script>
+</body>
+
+</html>
