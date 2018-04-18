@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Draw a point with a mouse click</title>
+</head>
+
+<body onload="main()">
+  <div style="padding: 10px">
+    <label for="sizer">Toggle Size</label>
+    <input type="range" min="1" max="100" value="10" step="1" name="" id="sizer">
+    <label for="color">Toggle Color</label>
+    <input type="color" value="#ff0000" name="" id="color">
+  </div>
+
+  <div style="padding: 10px">
+    <button onclick="shiftAll('up')">Shift Up</button>
+    <button onclick="shiftAll('down')">Shift Down</button>
+    <button onclick="shiftAll('left')">Shift Left</button>
+    <button onclick="shiftAll('right')">Shift Right</button>
+  </div>
+
+  <div style="padding: 10px">
+    <button id="mode" onclick="switchMode()">Start Delete</button>
+    <button class="selectBtn" disabled onclick="selectPrev()">Select Prev Line</button>
+    <button class="selectBtn" disabled onclick="selectNext()">Select Next Line</button>
+    <button class="selectBtn" disabled onclick="deleteSelect()">Delete Selected</button>
+  </div>
+
+  <div style="padding: 10px;">Delete mode will let you select one polyline and when you click delete button, it will be delete</div>
+  <div style="padding: 10px">
+    <canvas id="webgl" width="400" height="400" oncontextmenu="return false;">
+      Please use a browser that supports "canvas"
+    </canvas>
+  </div>
+  <script src="./lib/webgl-utils.js"></script>
+  <script src="./lib/webgl-debug.js"></script>
+  <script src="./lib/cuon-utils.js"></script>
+  <script src="./lib/load-file.js"></script>
+
+  <script id="vertexShader" type="x-shader/x-vertex" src="shaders/basic.vert"></script>
+  <script id="fragmentShader" type="x-shader/x-fragment" src="shaders/basic.frag"></script>
+  <script src="index.js"></script>
+</body>
+
+</html>
