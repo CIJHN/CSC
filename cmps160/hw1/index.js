@@ -23,7 +23,7 @@ const FSHADER_SOURCE =
 /**
  * Global var for render tick per second
  */
-const TPS = 60;
+const TPS = 20;
 
 
 let mode = 'draw';

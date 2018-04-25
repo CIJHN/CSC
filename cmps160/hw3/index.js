@@ -49,62 +49,6 @@ function flatMatrix(mat) {
 
 
 /**
- * 
- * @param {Vector3} from 
- * @param {Vector3} to 
- */
-function bakeIntersection(from, to, radius) {
-    const mid = new Vector3([from.elements[0] + to.elements[0],
-    from.elements[1] + to.elements[1],
-    from.elements[2] + to.elements[2]])
-
-    const len = radius / sinTheta(mid, from);
-    const scalar = len / length(mid);
-    scale(mid, scalar); // now mid is the translate of vertices
-}
-
-class CylinderPrototype {
-    /**
-     * 
-     * @param {number} faces 
-     * @param {number} radius 
-     */
-    constructor(faces, radius) {
-        const rotAngle = 360.0 / faces;
-
-        /**
-         * @type {Vector3[]}
-         */
-        const vertices = [];
-
-        const rot = new Matrix4();
-        rot.setTranslate(0, 0, radius);
-
-        for (let i = 0; i < faces; ++i) {
-            vertices.push(new Vector3(flatMatrix(rot)));
-            rot.rotate(rotAngle, 0, 1, 0);
-        }
-        this.vertices = vertices;
-    }
-
-    /**
-     * 
-     * @param {Vector3} vector 
-     */
-    at(vector) {
-
-    }
-
-    /**
-     * @param {number} angle 
-     */
-    toAngle(angle) {
-        return this.vertices.map(v => new Vector3(new Matrix4().setTranslate(v.elements[0], v.elements[1], v.elements[2])
-            .rotate(angle, 0, 0, 0)))
-    }
-}
-
-/**
  * @param {Polyline} polyline 
  * @param {number} faces 
  * @param {number} radius 
@@ -113,13 +57,18 @@ class CylinderPrototype {
 function bakeCylinders(polyline, faces, radius) {
     const vertices = [];
     const indexes = [];
+    const normals = [];
+    const colors = [];
+
+    const green = [0, 1, 0];
+
     let index = 2;
     const rotAngle = 360.0 / faces;
+    const zero = new Vector3();
 
     for (let i = 0; i < polyline.length - 1; ++i) {
         const from = polyline[i];
         const to = polyline[i + 1];
-
 
         const rot = new Matrix4();
         rot.setTranslate(0, 0, radius);
@@ -142,20 +91,34 @@ function bakeCylinders(polyline, faces, radius) {
         for (let i = 0; i < faces; ++i) {
             rot.rotate(rotAngle, rotX, rotY, rotZ);
 
+            const lastUpper = vertices.slice(vertices.length - 6, vertices.length - 3);
             const flatUpper = fmat(rot, from);
             const flatLower = fmat(rot, to);
 
-            vertices.push(...flatUpper);
-            vertices.push(...flatLower);
-            indexes.push(index - 1, index, index, index - 2); // complete first triangle
+            const vecLeft = diff(lastUpper, flatUpper);
+            const vecDown = diff(flatLower, flatUpper);
 
-            indexes.push(index, index - 1, index - 1, index + 1, index + 1, index); // sec triagnle
-            index += 2;
+            const norm = corss(vecLeft, vecDown);
+
+            vertices.push(...flatUpper, ...flatLower); // current surface right edge
+            vertices.push(...flatUpper, ...flatLower); // next surface left edge
+
+            indexes.push(index); // current surface first triangle
+            indexes.push(index, index - 1, index + 1); // current surface sec triagnle
+            indexes.push(index + 2, index + 3); // next surface left edge
+
+            normals.push(...norm.elements, ...norm.elements, ...norm.elements, ...norm.elements); // current 4 normal
+
+            colors.push(...green, ...green, ...green, ...green);
+
+            index += 4;
         }
     }
     return {
         vertices: new Float32Array(vertices),
         indexes: new Uint16Array(indexes),
+        normals: new Float32Array(normals),
+        colors: new Float32Array(colors),
     }
 }
 
@@ -269,6 +232,13 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
         return l;
     }
 
+    const uni = (loc) => {
+        const l = gl.getUniformLocation(gl.program, loc)
+        if (l < 0)
+            throw new Error(`Fail to get storage location of ${loc}`)
+        return l;
+    }
+
     /**
      * Convert mouse event to openGL coord position
      * 
@@ -285,7 +255,13 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
     }
 
     const a_Position = attr('a_Position');
-    const u_Color = gl.getUniformLocation(gl.program, 'u_Color');
+    const a_Color = attr('a_Color');
+
+    const u_LightDirection = uni('u_LightDirection');
+    const u_LightColor = uni('u_LightColor');
+    const u_Color = uni('u_Color');
+
+    
     const b_Pos = gl.createBuffer();
     const ib_Pos = gl.createBuffer();
     if (!b_Pos) {
@@ -356,24 +332,6 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
 
     function render() {
         gl.clear(gl.COLOR_BUFFER_BIT);
-
-        const renderTest = () => {
-            const vertices = new Float32Array([
-                0, 0, 0,
-                0.2, 0, 0,
-                0.2, 0.2, 0,
-                0.4, 0.2, 0,
-                -0.4, -0.2, 0]);
-            const indexes = new Uint16Array([0, 1, 0, 2, 0, 3, 0, 4]);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, b_Pos);
-            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_Pos);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexes, gl.STATIC_DRAW);
-
-            gl.drawElements(gl.LINES, indexes.length, gl.UNSIGNED_SHORT, 0);
-        }
         const renderLine = (line) => {
             if (line.length < 1) return;
             const pass = [...line];
@@ -397,7 +355,7 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_Pos);
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, cy.indexes, gl.STATIC_DRAW);
 
-                gl.drawElements(gl.LINES, cy.indexes.length, gl.UNSIGNED_SHORT, 0);
+                gl.drawElements(gl.TRIANGLES, cy.indexes.length, gl.UNSIGNED_SHORT, 0);
             }
         renderLine(polyline);
 
