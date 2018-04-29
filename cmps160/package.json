@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build:hw3": "tsc hw3/*.ts",
     "test": "node server.js",
     "pack": "node pack.js"
   },

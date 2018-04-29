@@ -6,13 +6,6 @@
         "index.js",
         "index.d.ts",
         "../global.d.ts",
-        "lib/cuon-matrix.js",
-        "lib/cuon-utils.js",
-        "lib/ioSOR.js",
-        "lib/load-file.js",
-        "lib/utils.js",
-        "lib/cylinder.js",
-        "lib/webgl-debug.js",
-        "lib/webgl-utils.js",
+        "lib/*",
     ]
 }

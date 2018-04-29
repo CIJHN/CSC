@@ -19,7 +19,7 @@
   </div>
 
   <div style="padding: 10px">
-    <canvas id="webgl" width="400" height="400" oncontextmenu="return false;">
+    <canvas id="webgl" width="400" height="400" oncontextmenu="return false;" style="border: 1px red">
       Please use a browser that supports "canvas"
     </canvas>
     <input type="file" id="fileinput">
@@ -33,7 +33,10 @@
   <script src="./lib/load-file.js"></script>
   <script src="./lib/ioSOR.js"></script>
   <script src="./lib/cuon-matrix.js"></script>
+  <script src="./lib/model.js"></script>
   <script src="./lib/utils.js"></script>
+  <script src="./lib/cylinder.driver.js"></script>
+  <script src="./lib/polyline.driver.js"></script>
 
 
   <script id="vertexShader" type="x-shader/x-vertex" src="shaders/basic.vert"></script>
