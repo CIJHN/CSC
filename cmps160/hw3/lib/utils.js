@@ -29,6 +29,11 @@ function diff(a, b) {
     return new Vector3([a.elements[0] - b.elements[0], a.elements[1] - b.elements[1], a.elements[2] - b.elements[2]])
 }
 
+function ave(a, b) {
+    const ae = a.elements;
+    const be = b.elements;
+    return new Vector3([(ae[0] + be[0]) / 2, (ae[1] + be[1]) / 2, (ae[2] + be[2]) / 2]);
+}
 /**
  * 
  * @param {Vector3} a 
@@ -58,8 +63,14 @@ function unit(vec) {
  * @param {number} scale 
  */
 function scale(vec, scale) {
-    for (let i = 0; i < 3; i++)
-        vec.elements[i] *= scale;
+    return new Vector3(vec.elements.map(v => v * scale))
+}
+
+function mul(a, b) {
+    const other = new Vector3();
+    for (let i = 0; i < 3; ++i)
+        other.elements[i] = a.elements[i] * b.elements[i];
+    return other;
 }
 
 /**
@@ -111,4 +122,11 @@ ${e[2].toFixed(2)} ${e[6].toFixed(2)} ${e[10].toFixed(2)} ${e[14].toFixed(2)}
 ${e[3].toFixed(2)} ${e[7].toFixed(2)} ${e[11].toFixed(2)} ${e[15].toFixed(2)}
     `
     return str;
+}
+
+Vector3.prototype.toString = function () {
+    return `(${this.elements[0]},${this.elements[1]},${this.elements[2]})`;
+}
+Vector4.prototype.toString = function () {
+    return `(${this.elements[0]},${this.elements[1]},${this.elements[2]},${this.elements[3]})`;
 }
