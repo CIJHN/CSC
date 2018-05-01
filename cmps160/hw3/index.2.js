@@ -117,7 +117,6 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
     document.getElementById('width').onchange = function () {
         Cylinder.radius = this.value;
     }
-
     canvas.onmousemove = function (ev) {
         const { x, y } = glPosition(canvas, ev);
         Polyline.tempPoint.x = x;

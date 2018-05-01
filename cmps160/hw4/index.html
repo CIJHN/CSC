@@ -15,17 +15,28 @@
     <input type="range" min="3" max="16" value="12" step="1" id="face">
 
     <button id="shift">Shift Model</button>
-    
-
-    <label for="color">Toggle Color</label>
-    <input type="color" value="#ff0000" name="" id="color">
   </div>
 
   <div style="padding: 10px">
-    Light 1: <input type="checkbox" id="light_1_toggle" checked="true"> <input type="color" value="#ffffff" name="" id="light_1_color" > <button id="shiftLight">Shift Light</button> 
+    Light:
+    <select id="shaders">
+      <option value="1">Gouraud shading</option>
+      <option value="2">Phong shading</option>
+      <option value="3">Depth shading</option>
+      <option value="4">Rim shading</option>
+      <option value="4">Toon/Cel shading</option>
+    </select>
+    <label>Ambient Color:</label>
+    <input type="color" id="ambient_color" value="#000033">
+    <label>Specular Color:</label>
+    <input type="color" id="specular_color" value="#ffffff">
+    <label>Toggle Glossiness:</label>
+    <input type="range" min="0" max="20" value="10" step="1" id="glossiness">
+
+    <button id="shiftLight">Shift Light</button>
     <button id="rotateLight">Rotate Light</button>
-    Animate Light: <input id="animateLight" type="checkbox"> 
-    Light 2: <input type="checkbox" id="light_2_toggle" checked="true"> <input type="color" value="#ff0000" name="" id="light_2_color">
+    Animate Light:
+    <input id="animateLight" type="checkbox">
   </div>
   <div style="padding: 10px">
     <canvas id="webgl" width="400" height="400" oncontextmenu="return false;" style="border: 1px red">

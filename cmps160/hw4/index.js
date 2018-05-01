@@ -47,7 +47,7 @@ function flatMatrix(mat) {
     ]
 }
 
-let lightDirection = [1, 1, 1];
+let lightPosition = [-1, -1, -1];
 
 const color = new Vector4([0, 1, 0, 1]);
 
@@ -106,7 +106,9 @@ function bakeCylinders(polyline, faces, radius) {
 
             const vecLeft = diff(new Vector3(lastLower), new Vector3(lastUpper)).normalize();
             const vecDown = diff(new Vector3(flatUpper), new Vector3(lastUpper)).normalize();
-            const norm = cross(vecDown, vecLeft).normalize();
+            // const norm = cross(vecLeft, vecDown).normalize();
+            // console.log('asd')
+            const norm = new Vector3(fmat(rot, zero)).normalize();
 
             normals.push(...norm.elements, ...norm.elements, ...norm.elements, ...norm.elements); // current 4 normal
 
@@ -180,51 +182,8 @@ ${e[3].toFixed(2)} ${e[7].toFixed(2)} ${e[11].toFixed(2)} ${e[15].toFixed(2)}
 }
 
 function main() {
-    // Promise.all([ldfile('shaders/basic.vert'), ldfile('shaders/basic.frag')])
-    //     .then(setup);
-    setup([`attribute vec4 a_Position;
-    attribute vec3 a_Normal;
-    attribute vec4 a_Color;
-    
-    uniform int u_Lighting; 
-    
-    uniform int u_Lighting_1;
-    uniform vec3 u_LightDirection_1;
-    uniform vec3 u_LightColor_1;
-    
-    uniform int u_Lighting_2;
-    uniform vec3 u_LightDirection_2;
-    uniform vec3 u_LightColor_2;
-    
-    uniform vec4 u_Color; // ambi color
-    
-    varying vec4 v_Color; 
-    
-    void main() {
-        gl_Position = a_Position;
-        
-        if (u_Lighting == 1) {
-            vec3 diffuseColor = vec3(0, 0, 0);
-            if (u_Lighting_1 == 1) {
-                vec3 c = max(dot(normalize(u_LightDirection_1), normalize(a_Normal)), 0.0) * u_LightColor_1;
-                diffuseColor = diffuseColor + c;
-            }
-            if (u_Lighting_2 == 1) {
-                vec3 c = max(dot(normalize(u_LightDirection_2), normalize(a_Normal)), 0.0) * u_LightColor_2;
-                diffuseColor = diffuseColor + c;
-            }
-    
-            v_Color = vec4(diffuseColor * a_Color.rgb, a_Color.a);
-        } else {
-            v_Color = a_Color;
-        }
-    }`,`precision mediump float;
-    varying vec4 v_Color;
-    
-    void main () {
-        gl_FragColor = v_Color;
-    }
-    `])
+    Promise.all([ldfile('shaders/basic.vert'), ldfile('shaders/basic.frag')])
+        .then(setup);
 }
 
 function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
@@ -271,6 +230,7 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
 
     const canvas = document.getElementById('webgl');
     const gl = getWebGLContext(canvas);
+    let shader = 1;
     if (!gl) {
         console.log('Failed to get the rendering context for WebGL');
         return;
@@ -313,23 +273,16 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
     const a_Normal = attr('a_Normal');
     const a_Color = attr('a_Color');
 
-    const u_Lighting_1 = uni('u_Lighting_1');
-    const u_LightDirection_1 = uni('u_LightDirection_1');
-    const u_LightColor_1 = uni('u_LightColor_1');
+    const u_LightPosition = uni('u_LightPosition');
+    const u_DiffuseColor = uni('u_DiffuseColor');
+    const u_SpecularColor = uni('u_SpecularColor');
+    const u_AmbientColor = uni('u_AmbientColor');
+    const u_Glossiness = uni('u_Glossiness');
+    const u_ViewDirection = uni('u_ViewDirection');
 
-    const u_Lighting_2 = uni('u_Lighting_2');
-    const u_LightDirection_2 = uni('u_LightDirection_2');
-    const u_LightColor_2 = uni('u_LightColor_2');
-
-    gl.uniform1i(u_Lighting_1, 1);
-    gl.uniform1i(u_Lighting_2, 1);
-
-    gl.uniform3fv(u_LightDirection_1, lightDirection);
-    gl.uniform3fv(u_LightColor_1, [1, 1, 1]);
-
-    gl.uniform3fv(u_LightDirection_2, [1, 1, 1]);
-    gl.uniform3fv(u_LightColor_2, [1, 0, 0]);
-
+    gl.uniform3fv(u_ViewDirection, [0, 0, -1]);
+    gl.uniform3fv(u_LightPosition, lightPosition);
+    gl.uniform3fv(u_DiffuseColor, [1, 1, 1]);
     const u_Lighting = uni('u_Lighting');
 
     const b_Pos = gl.createBuffer();
@@ -385,7 +338,7 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
                 if (cy.indexes.length === 0) return
                 gl.enableVertexAttribArray(a_Color);
                 gl.enableVertexAttribArray(a_Normal);
-                gl.uniform1i(u_Lighting, 1);
+                gl.uniform1i(u_Lighting, shader);
 
                 gl.bindBuffer(gl.ARRAY_BUFFER, b_Pos);
                 gl.bufferData(gl.ARRAY_BUFFER, cy.vertices, gl.STATIC_DRAW);
@@ -402,7 +355,6 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
                 gl.drawElements(gl.TRIANGLES, cy.indexes.length, gl.UNSIGNED_SHORT, 0);
                 gl.disableVertexAttribArray(a_Normal);
                 gl.disableVertexAttribArray(a_Color);
-
             }
         renderLine(polyline);
         renderCylinder(cylinders);
@@ -413,69 +365,68 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
      ********************/
 
     const colorInput = document.getElementById('color');
-    setupIOSOR("fileinput");
+    // setupIOSOR("fileinput");
 
+
+    const sder = document.getElementById('shaders');
+    sder.onchange = function () {
+        shader = Number.parseInt(this.value);
+        console.log(shader)
+    }
+    sder.onchange();
+
+    const spc = document.getElementById('specular_color');
+    spc.onchange = function () {
+        gl.uniform3fv(u_SpecularColor, hashToRGB(this.value));
+    };
+    spc.onchange();
+
+    const amb = document.getElementById('ambient_color');
+    amb.onchange = function () {
+        gl.uniform3fv(u_AmbientColor, hashToRGB(this.value));
+    }
+    amb.onchange();
+
+    const glos = document.getElementById('glossiness');
+    glos.onchange = function () {
+        gl.uniform1i(u_Glossiness, this.value);
+    }
+    glos.onchange();
+
+    document.getElementById('reset_canvas').onclick = function () {
+        cylinders.indexes = new Uint16Array(0);
+        cylinders.vertices = new Float32Array(0);
+    };
     document.getElementById('shift').onclick = function () {
         for (let i = 0; i < cylinders.vertices.length; i += 3) {
             cylinders.vertices[i] += 0.01;
         }
     }
-
-    document.getElementById('extra_sor').onclick = function () {
-        const sor = readFile();      // get SOR from file
-        if (sor) {
-            cylinders.vertices = new Float32Array(sor.vertices);
-            cylinders.indexes = new Uint16Array(sor.indexes);
-        }
-    }
-    document.getElementById('save_canvas').onclick = function () {
-        const sor = new SOR();
-        sor.objName = "model";
-        sor.vertices = cylinders.vertices;
-        sor.indexes = cylinders.indexes;
-        saveFile(sor);
-    };
-    document.getElementById('reset_canvas').onclick = function () {
-        cylinders.indexes = new Uint16Array(0);
-        cylinders.vertices = new Float32Array(0);
-    };
-    document.getElementById('light_1_toggle').onchange = function () {
-        gl.uniform1i(u_Lighting_1, this.checked ? 1 : 0)
-    }
-    document.getElementById('light_2_toggle').onchange = function () {
-        gl.uniform1i(u_Lighting_2, this.checked ? 1 : 0)
-    }
-    document.getElementById('light_1_color').onchange = function () {
-        gl.uniform3fv(u_LightColor_1, hashToRGB(this.value))
-    }
-    document.getElementById('light_2_color').onchange = function () {
-        gl.uniform3fv(u_LightColor_2, hashToRGB(this.value))
-    }
     document.getElementById('shiftLight').onclick = function () {
-        lightDirection[0] -= 0.1;
-        gl.uniform3fv(u_LightDirection_1, lightDirection);
+        // lightDirection[0] -= 0.1;
+        // gl.uniform3fv(u_LightDirection_1, lightDirection);
     }
     document.getElementById('rotateLight').onclick = function () {
-        const m = new Matrix4();
-        m.setTranslate(lightDirection[0], lightDirection[1], lightDirection[2]);
-        m.rotate(10, 0, 1, 0);
-        lightDirection = flatMatrix(m);
-        gl.uniform3fv(u_LightDirection_1, lightDirection);
+        // const m = new Matrix4();
+        // m.setTranslate(lightDirection[0], lightDirection[1], lightDirection[2]);
+        // m.rotate(10, 0, 1, 0);
+        // lightDirection = flatMatrix(m);
+        // gl.uniform3fv(u_LightDirection_1, lightDirection);
     }
     let inv;
     document.getElementById('animateLight').onchange = function () {
-        if (this.checked) {
-            if (inv) clearInterval(inv);
-            inv = setInterval(() => {
-                const m = new Matrix4();
-                m.setTranslate(lightDirection[0], lightDirection[1], lightDirection[2]);
-                m.rotate(1, 0, 1, 0);
-                lightDirection = flatMatrix(m);
-                gl.uniform3fv(u_LightDirection_1, lightDirection);
-            }, 10);
-        } else {
-            clearInterval(inv);
-        }
+        // if (this.checked) {
+        //     if (inv) clearInterval(inv);
+        //     inv = setInterval(() => {
+        //         const m = new Matrix4();
+        //         m.setTranslate(lightDirection[0], lightDirection[1], lightDirection[2]);
+        //         m.rotate(1, 0, 1, 0);
+        //         lightDirection = flatMatrix(m);
+        //         gl.uniform3fv(u_LightDirection_1, lightDirection);
+        //     }, 10);
+        // } else {
+        //     clearInterval(inv);
+        // }
     }
 
     const tempPoint = { x: 0, y: 0 };
