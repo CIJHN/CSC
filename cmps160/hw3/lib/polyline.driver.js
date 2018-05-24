@@ -24,6 +24,7 @@ const Polyline = {
         gl.enableVertexAttribArray(a_Position);
         gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
         this.u_Lighting = gl.getUniformLocation(gl.program, 'u_Lighting');
+        this.a_Position = a_Position;
     },
     /**
      * 
@@ -33,7 +34,7 @@ const Polyline = {
         const line = this.lines;
         if (line.length < 1) return;
         gl.uniform1i(this.u_Lighting, 0);
-
+      
         const pass = [...line, new Vec3(this.tempPoint.x, this.tempPoint.y, 0)];
         const pos = new Float32Array(pass.length * 3);
         for (let i = 0; i < pass.length; i++) {
@@ -43,6 +44,10 @@ const Polyline = {
             pos[i * 3 + 2] = 0;
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
+        // gl.enableVertexAttribArray(this.a_Position);
+        gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, 0, 0);
+// 
         gl.bufferData(gl.ARRAY_BUFFER, pos, gl.STATIC_DRAW);
         gl.drawArrays(gl.LINE_STRIP, 0, pass.length);
     }

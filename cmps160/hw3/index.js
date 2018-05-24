@@ -1,7 +1,7 @@
 /**
  * Global var for render tick per second
  */
-const TPS = 10;
+const TPS = 1;
 
 /**
  * @param {string} name 
@@ -29,7 +29,7 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
     /**
     * @type {GLDriver[]}
     */
-    const drivers = [Polyline, /* Cylinder */];
+    const drivers = [Polyline, Cylinder];
 
     const canvas = document.getElementById('webgl');
     const gl = getWebGLContext(canvas);
@@ -55,6 +55,9 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
             throw new Error(`Fail to get storage location of ${loc}`)
         return l;
     }
+
+    const u_Color = uni('u_Color');
+    gl.uniform4f(u_Color, 0, 1, 0, 1);
 
     drivers.forEach(driver => driver.init(gl, gl.program))
 

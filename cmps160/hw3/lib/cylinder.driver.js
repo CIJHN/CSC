@@ -110,9 +110,9 @@ const Cylinder = {
 
             const fmat = (m, t) => {
                 const arr = flatMatrix(m);
-                arr[0] += t.elements[0];
-                arr[1] += t.elements[1];
-                arr[2] += t.elements[2];
+                arr[0] += t.x;
+                arr[1] += t.y;
+                arr[2] += t.z;
                 return xyz(arr[0], arr[1], arr[2]);
             }
 
