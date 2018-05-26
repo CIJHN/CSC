@@ -1,7 +1,7 @@
 /**
  * Global var for render tick per second
  */
-const TPS = 10;
+const TPS = 1;
 
 
 /**
