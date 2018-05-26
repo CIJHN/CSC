@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from nltk import word_tokenize, download
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
@@ -8,22 +10,19 @@ import sys
 import string
 import re
 
-global line_n
-
-line_n = 0
-
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 def process(filename):
     src = open(filename, 'r')
-    dist = open(filename + '.tok', 'w')
+    dist = open('HW3_Xu_train.csv', 'w')
+    tok_dist = open(filename + '.tok', 'w')
     id_map_dist = open(filename + '.idmap', 'w')
     text = src.read()
     text = text.lower() # put all lower case
     lines = filter(lambda l: len(l) > 0, text.split('\n')) # split lines and filter out the last line which is empty
 
-    punc = re.compile('[%s]' % (re.escape(string.punctuation) + re.escape(u'\u2019')))
+    punc = re.compile('[%s]' % (re.escape(string.punctuation) + re.escape(u'\u2019') + re.escape(u'\u2018')))
     words = set(map(lambda w: punc.sub('', w), stopwords.words('english'))) # stopwords without the '
     stemmer = PorterStemmer()
 
@@ -62,8 +61,26 @@ def process(filename):
                 current_id += 1
 
     for tokens in instances:
-        dist.write(unicode(tokens) + '\n')
-    # instances = map(lambda tokens: map(lambda w: id_map[w], tokens), instances)
+        tok_dist.write(unicode(tokens) + '\n')
+    
+    vec_len = len(id_map)
+    def build_vec(tokens):
+        vec = [0] * (vec_len + 1)
+        for w in tokens[1:]:
+            vec[id_map[w]] = counts[w]
+            vec[-1] = tokens[0]
+        return vec
+
+    vecs = map(build_vec, instances)
+    headers = [''] * (vec_len + 1)
+    for w, i in id_map.iteritems():
+        headers[i] = w
+    headers[-1] = u'label'
+
+
+    dist.write(','.join(headers) + '\n')
+    for vec in vecs:
+        dist.write(','.join(map(lambda v: unicode(v), vec)) + '\n')
 
     print len(id_map)
 
