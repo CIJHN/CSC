@@ -31,7 +31,8 @@ def process(train_file, test_file):
     lines = filter(lambda l: len(l) > 0, text.split('\n')) # split lines and filter out the last line which is empty
 
     punc = re.compile('[%s]' % (re.escape(string.punctuation)))
-    words = set(map(lambda w: punc.sub('', w), stopwords.words('english'))) # stopwords without the '
+    words = set(stopwords.words('english'))
+    # words = set(map(lambda w: punc.sub('', w), stopwords.words('english'))) # stopwords without the '
     stemmer = PorterStemmer()
 
     counts = dict() # total count map

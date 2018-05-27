@@ -1,0 +1,8 @@
+# How to run the code
+
+require python 2.7, nltk installed
+
+put the parse.py, the train (train_file_cmps142_hw3) and test file (test_file_cmps142_hw3) 
+in the same directory
+
+run "python ./parse.py" in bash to generate "HW3_Xu.train.csv" and "HW3_Xu.test.csv"
