@@ -21,6 +21,7 @@ uniform vec3 u_ViewDirection;
 varying vec4 v_Color;
 varying vec3 v_Normal;
 varying vec3 v_LightDirection;
+varying float v_Depth;
 
 void main() {
     gl_Position = a_Position;
@@ -40,9 +41,13 @@ void main() {
         vec3 specularColor = pow(max(dot(reflection, view), 0.0), float(glossiness)) * u_SpecularColor;
 
         v_Color = vec4(ambientColor + diffuseColor + specularColor, a_Color.a);
-    } else { // Phong
+    } else if (u_Lighting == 2 ) { // Phong
         v_Color = a_Color;
         v_Normal = normalize(a_Normal);
         v_LightDirection = normalize(u_LightPosition - a_Position.xyz);
+    } else if (u_Lighting == 3) { // Depth
+        v_Color = vec4(vec3(1.0, 1.0, 1.0) * (-a_Position.z / 0.2), 1.0);
+    } else if (u_Lighting == 4) {
+        v_Color = vec4((vec3(1.0, 1.0, 1.0) - vec3(1.0, 1.0, 1.0) * (-a_Position.z / 0.3)), 1.0);
     }
 }

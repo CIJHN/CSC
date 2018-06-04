@@ -13,11 +13,12 @@ uniform vec3 u_SpecularColor;
 varying vec4 v_Color;
 varying vec3 v_Normal;
 varying vec3 v_LightDirection;
+varying float v_Depth;
 
 void main () {
     if (u_Lighting == 0 || u_Lighting == 1) {
         gl_FragColor = v_Color;
-    } else {
+    } else if (u_Lighting == 2) {
         int glossiness = u_Glossiness;
         vec3 normal = v_Normal;
         vec3 lightDirection = v_LightDirection;
@@ -30,5 +31,7 @@ void main () {
         vec3 specularColor = pow(max(dot(reflection, view), 0.0), float(glossiness)) * u_SpecularColor;
 
         gl_FragColor = vec4(ambientColor + diffuseColor + specularColor, v_Color.a);
+    } else {
+        gl_FragColor = v_Color;
     }
 }
