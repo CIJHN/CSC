@@ -1,7 +1,7 @@
 /**
  * Global var for render tick per second
  */
-const TPS = 10;
+const TPS = 24;
 
 
 /**
@@ -15,6 +15,8 @@ let polyline = [];
  */
 const cylinders = { vertices: new Float32Array(0), indexes: new Uint16Array(0), normals: new Float32Array(0), colors: new Float32Array(0) };
 
+const viewMatrix = new Matrix4();
+const projMatrix = new Matrix4();
 
 /**
  * Flat the polyline to drawable array
@@ -95,6 +97,9 @@ function bakeCylinders(polyline, faces, radius) {
             const lastLower = fmat(rot, to);
             vertices.push(...lastUpper, ...lastLower); // current surface left edge
 
+            let norm = new Vector3(fmat(rot, zero)).normalize();
+            normals.push(...norm.elements, ...norm.elements); // first 2 normal
+
             rot.rotate(-rotAngle, rotX, rotY, 0);
 
             const flatUpper = fmat(rot, from);
@@ -104,13 +109,9 @@ function bakeCylinders(polyline, faces, radius) {
             indexes.push(index, index + 1, index + 2); // current surface first triangle
             indexes.push(index + 2, index + 3, index + 1); // current surface sec triagnle
 
-            const vecLeft = diff(new Vector3(lastLower), new Vector3(lastUpper)).normalize();
-            const vecDown = diff(new Vector3(flatUpper), new Vector3(lastUpper)).normalize();
-            // const norm = cross(vecLeft, vecDown).normalize();
-            // console.log('asd')
-            const norm = new Vector3(fmat(rot, zero)).normalize();
+            norm = new Vector3(fmat(rot, zero)).normalize();
 
-            normals.push(...norm.elements, ...norm.elements, ...norm.elements, ...norm.elements); // current 4 normal
+            normals.push(...norm.elements, ...norm.elements); // second 2 normal
 
             let c;
             // c = calculateColor(norm, green, lightColor, lightDirection);
@@ -208,16 +209,11 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
     function flush() {
         if (polyline.length <= 1) return;
         console.log('You have finished drawing');
-        let s = ''
-        for (let i = 0; i < polyline.length; i += 2) {
-            s += `(${polyline[i].x}, ${polyline[i].y}) `
-        }
-        console.log(`your polyline ${s}`);
 
         const faces = Number.parseInt(document.getElementById('face').value);
         const radius = Number.parseFloat(document.getElementById('width').value);
 
-        console.log(`faces: ${faces}, radius: ${radius}`)
+        // console.log(`faces: ${faces}, radius: ${radius}`)
 
         concatModel(cylinders, bakeCylinders(polyline, faces, radius));
 
@@ -284,6 +280,15 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
     gl.uniform3fv(u_LightPosition, lightPosition);
     gl.uniform3fv(u_DiffuseColor, [1, 1, 1]);
     const u_Lighting = uni('u_Lighting');
+
+    const u_ViewMatrix = uni('u_ViewMatrix');
+    const u_ProjMatrix = uni('u_ProjMatrix');
+
+    viewMatrix.setLookAt(0, 0, 5, 0, 0, -100, 0, 1, 0);
+    projMatrix.setPerspective(90, canvas.width / canvas.height, 1, 100);
+
+    gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
+    gl.uniformMatrix4fv(u_ProjMatrix, false, projMatrix.elements);
 
     const b_Pos = gl.createBuffer();
     const ib_Pos = gl.createBuffer();
@@ -403,30 +408,30 @@ function setup([VSHADER_SOURCE, FSHADER_SOURCE]) {
         }
     }
     document.getElementById('shiftLight').onclick = function () {
-        // lightDirection[0] -= 0.1;
-        // gl.uniform3fv(u_LightDirection_1, lightDirection);
+        lightPosition[0] += 0.1;
+        gl.uniform3fv(u_LightPosition, lightPosition);
     }
     document.getElementById('rotateLight').onclick = function () {
-        // const m = new Matrix4();
-        // m.setTranslate(lightDirection[0], lightDirection[1], lightDirection[2]);
-        // m.rotate(10, 0, 1, 0);
-        // lightDirection = flatMatrix(m);
-        // gl.uniform3fv(u_LightDirection_1, lightDirection);
+        const m = new Matrix4();
+        m.setTranslate(lightPosition[0], lightPosition[1], lightPosition[2]);
+        m.rotate(10, 0, 1, 0);
+        lightPosition = flatMatrix(m);
+        gl.uniform3fv(u_LightPosition, lightPosition);
     }
     let inv;
     document.getElementById('animateLight').onchange = function () {
-        // if (this.checked) {
-        //     if (inv) clearInterval(inv);
-        //     inv = setInterval(() => {
-        //         const m = new Matrix4();
-        //         m.setTranslate(lightDirection[0], lightDirection[1], lightDirection[2]);
-        //         m.rotate(1, 0, 1, 0);
-        //         lightDirection = flatMatrix(m);
-        //         gl.uniform3fv(u_LightDirection_1, lightDirection);
-        //     }, 10);
-        // } else {
-        //     clearInterval(inv);
-        // }
+        if (this.checked) {
+            if (inv) clearInterval(inv);
+            inv = setInterval(() => {
+                const m = new Matrix4();
+                m.setTranslate(lightPosition[0], lightPosition[1], lightPosition[2]);
+                m.rotate(10, 0, 1, 0);
+                lightPosition = flatMatrix(m);
+                gl.uniform3fv(u_LightPosition, lightPosition);
+            }, 100);
+        } else {
+            clearInterval(inv);
+        }
     }
 
     const tempPoint = { x: 0, y: 0 };
