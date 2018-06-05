@@ -69,7 +69,7 @@ public class LogisticRegression {
 	 * This function should call probPred1()
 	 **/
 	public int predict(double[] x) {
-		return probPred1(x) > 0.5 ? 1 : 0;
+		return probPred1(x) >= 0.5 ? 1 : 0;
 	}
 
 	/**
