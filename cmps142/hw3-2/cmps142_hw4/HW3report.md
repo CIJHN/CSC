@@ -22,8 +22,8 @@ File submitted: HW3_Xu_code.zip,
 | 146| 15  |  
 | -- | --- | 
 | 34 | 920 |
-10. .
-11. We can balance the numbers of positve and negative instances to improve the performance.
+1. ![](image.png)
+2. We can balance the numbers of positve and negative instances to improve the performance.
 
 #2.2
 
