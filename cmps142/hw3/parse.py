@@ -111,7 +111,7 @@ def process(train_file, test_file):
     print '7a. %s' % 'HW3_Xu_train.csv'
     print '7b. %s' % (u'yellow' in id_map)
     print '7c. %s' % (u'music' in id_map)
-    print '7d. %d' % reduce(lambda a, b: a + b, vecs[1][0 : -1], 0)
+    print '7d. %d' % reduce(lambda a, b: a + b, vecs[0][0 : -1], 0)
     print '7e. %d' % len(filter(lambda vec: reduce(lambda a, b: a + b, vec[0 : -1], 0) == 0, vecs))
 
     # apply the same process to test lines
