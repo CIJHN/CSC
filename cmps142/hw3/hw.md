@@ -1,11 +1,11 @@
-Name: Hongze Xu, Yijiong Xu, Wenqiao Zhu
-
+Name: Hongze Xu Hoxu, Yijiong Xu yxu49, Wenqiao Zhu wzhu8
+File submitted: HW3_Xu_code.zip,
 
 # 1.1
 
 2a. 8690
 
-5a. [u've', u'search', u'right', u'word', u'thank', u'breather', u'promis', u'wont', u'take', u'help', u'grant', u'fulfil', u'promis', u'wonder', u'bless', u'time']
+5a. ['ve', 'search', 'right', 'word', 'thank', 'breather', 'promis', 'wont', 'take', 'help', 'grant', 'fulfil', 'promis', 'wonder', 'bless', 'time']
 
 6a. 1356
 
@@ -21,7 +21,7 @@ Name: Hongze Xu, Yijiong Xu, Wenqiao Zhu
 
 # 1.2
 
-1a. [u'hi', u'wk', u'ok', u'hol', u'ye', u'bit', u'run', u'forgot', u'hairdress', u'appoint', u'four', u'need', u'get', u'home', u'n', u'shower', u'beforehand', u'caus', u'prob', u'u']
+1a. ['hi', 'wk', 'ok', 'hol', 'ye', 'bit', 'run', 'forgot', 'hairdress', 'appoint', 'four', 'need', 'get', 'home', 'n', 'shower', 'beforehand', 'caus', 'prob', 'u']
 
 2a. HW3_Xu_test.csv
 
@@ -29,7 +29,7 @@ Name: Hongze Xu, Yijiong Xu, Wenqiao Zhu
 
 2c. 1357
 
-2d. first 5 names in train [u'go', u'point', u'crazi', u'avail', u'bugi'], first 5 names in test [u'go', u'point', u'crazi', u'avail', u'bugi']
+2d. first 5 names in train ['go', 'point', 'crazi', 'avail', 'bugi'], first 5 names in test ['go', 'point', 'crazi', 'avail', 'bugi']
 
 2e. True
 

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Draw a point with a mouse click</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body onload="main()">
+  <div id="app">
+    <div style="padding: 10px">
+      <label>Toggle Width</label>
+      <input type="range" min="0.01" max="0.5" value="0.2" step="0.01" v-model="width">
+
+      <label>Toggle Faces</label>
+      <input type="range" min="3" max="16" value="12" step="1" v-model="face">
+    </div>
+
+    <div style="padding: 10px">
+      Light:
+
+      <label>Ambient Color:</label>
+      <input type="color" v-model="light.ambientColor" value="#000033">
+      <label>Specular Color:</label>
+      <input type="color" v-model="light.specularColor" value="#ffffff">
+      <label>Toggle Glossiness:</label>
+      <input type="range" min="0" max="20" value="10" step="1" v-model.number="light.glossiness">
+    </div>
+    <div style="padding: 10px">
+      <label>Camera: </label>
+      (Hold Ctrl button and drag the screen to pan camera)
+      <button @click="shake">Shake Camera</button>
+
+      <div style="padding: 10px">
+        <label> Turn Camera on Y axis: </label>
+        <input v-model.number="camera.lookAt.centerX" type="range" min="-10" max="10" step="0.5">
+        <label> Turn Camera on X axis: </label>
+        <input v-model.number="camera.lookAt.centerY" type="range" min="-10" max="10" step="0.5">
+      </div>
+
+      <div style="padding: 10px;">
+        <label>Move Camera on Z axis:</label>
+        <input v-model.number="camera.translateZ" type="range" min="-10" max="10" step="0.5">
+
+        <label>Rotate Camera on Z axis:</label>
+        <input v-model.number="camera.rotZ" type="range" min="0" max="360" step="10">
+
+      </div>
+      <label>Projection: </label>
+      <select v-model="camera.projection">
+        <option value="perspective">Perspective</option>
+        <option value="ortho">Orthogonal</option>
+      </select>
+      <div v-if="camera.projection === 'perspective'">
+        <div style="padding: 10px;">
+          <label>Perspective: </label>
+          <label>Toggle Fov:</label>
+          <input name="fov" v-model.number="camera.perspective.fovy" type="range" min="1" max="179" step="1">
+          <label>Toggle nearZ:</label>
+          <input name="nearZ" v-model.number="camera.perspective.near" type="range" min="1" max="100" step="1" value="1">
+          <label>Toggle farZ:</label>
+          <input name="farZ" v-model.number="camera.perspective.far" type="range" min="10" max="1000" step="1" value="100">
+        </div>
+        <div style="padding: 10px;">
+          <label>Change aspect to stretch:</label>
+          <input v-model.number="camera.perspective.aspect" type="range" min="0.1" max="2" step="0.1">
+        </div>
+      </div>
+      <div v-else>
+        <label>Otho: </label>
+        <label>Toggle nearZ:</label>
+        <input v-model.number="camera.ortho.near" type="range" min="-1" max="2" step="0.05" value="0">
+        <label>Toggle farZ:</label>
+        <input v-model.number="camera.ortho.far" type="range" min="3" max="10" step="0.2" value="2">
+      </div>
+    </div>
+    <button type="button" @click="reset">Reset Canvas</button>
+
+  </div>
+  <div style="padding: 10px">
+    <canvas id="webgl" width="400" height="400" oncontextmenu="return false;" style="border: 1px red">
+      Please use a browser that supports "canvas"
+    </canvas>
+  </div>
+  <script src="./lib/webgl-utils.js"></script>
+  <script src="./lib/webgl-debug.js"></script>
+  <script src="./lib/cuon-utils.js"></script>
+  <script src="./lib/load-file.js"></script>
+  <script src="./lib/ioSOR.js"></script>
+  <script src="./lib/cuon-matrix.js"></script>
+  <script src="./lib/model.js"></script>
+  <script src="./lib/utils.js"></script>
+  <script src="./lib/cylinder.driver.js"></script>
+  <script src="./lib/polyline.driver.js"></script>
+
+  <script id="vertexShader" type="x-shader/x-vertex" src="shaders/basic.vert"></script>
+  <script id="fragmentShader" type="x-shader/x-fragment" src="shaders/basic.frag"></script>
+  <script src="index.js"></script>
+</body>
+
+</html>

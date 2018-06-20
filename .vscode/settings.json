@@ -43,5 +43,6 @@
         "d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
         "haskell": "runhaskell",
         "nim": "nim compile --verbosity:0 --hints:off --run"
-    }
+    },
+    "python.pythonPath": "C:\\Program Files\\Python27\\python.exe"
 }
