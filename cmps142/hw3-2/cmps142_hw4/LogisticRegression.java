@@ -129,10 +129,10 @@ public class LogisticRegression {
 			double lik = 0.0; // Stores log-likelihood of the training data for this iteration
 			for (int i = 0; i < instances.size(); i++) {
 				LRInstance inst = instances.get(i);
-				int output_i = predict(inst.x);
-				int target_i = inst.label;
+				double output_i = probPred1(inst.x);
+				double target_i = inst.label;
 				for (int j = 0; j < weights.length; ++j) {
-					weights[j] += ((target_i - output_i) * inst.x[j]) * this.rate;
+					weights[j] += this.rate * ((target_i - output_i) * inst.x[j]);
 				}
 				double prob = probPred1(inst.x);
 				lik += Math.log(Math.pow(prob, inst.label) * Math.pow(1.0 - prob, 1 - inst.label));

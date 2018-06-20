@@ -136,8 +136,8 @@ public class LogisticRegression_withRegularization {
 			double lik = 0.0; // Stores log-likelihood of the training data for this iteration
 			for (int i = 0; i < instances.size(); i++) {
 				LRInstance inst = instances.get(i);
-				int output_i = predict(inst.x);
-				int target_i = inst.label;
+				double output_i = probPred1(inst.x);
+				double target_i = inst.label;
 				for (int j = 0; j < weights.length; ++j) {
 					weights[j] += ((target_i - output_i) * inst.x[j] - lambda * weights[j]) * this.rate;
 					// extra regularization
